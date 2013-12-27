@@ -3,7 +3,8 @@ paka.js
 
 paka.js is a parser combinator for JavaScript. 
 
-### Caculator Example ###
+**Caculator Example**
+
 ```javascript
 var paka = require('../../paka.js');
 var path = require('path');
