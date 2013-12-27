@@ -1,7 +1,7 @@
 paka.js 
 =======
 
-Paka.js is a higher-order function based parser combinator. Parser combinator is a kind of embedded parser generator which defines language grammar with an embedded DSL. Unlike external parser generators such as ANTLR, there's no static code generation required. The embedded DSL of paka.js is in pure JavaScript, so for writing a parser in JavaScript, it is much easier and light-weighted than external parser generators.
+Paka.js is a higher-order function based parser combinator. Parser combinator is a kind of embedded parser generator which defines language grammar with an embedded DSL. Unlike external parser generators such as ANTLR, there's no static code generation required. The embedded DSL of paka.js is in pure JavaScript, so for writing language parsers in JavaScript, it is much easier and light-weighted than external parser generators.
 
 **Example**
 
