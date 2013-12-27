@@ -9,14 +9,6 @@ The following code implements a caculator with paka.js in less than 100 lines of
 
 ```javascript
 var paka = require('../../paka.js');
-var path = require('path');
-var util = require('util');
-
-var PROGRAM = path.basename(process.argv[1]);
-
-function help() {
-    console.log('Example: ' + PROGRAM + ' "(1 + 2) * 3 - 1"');
-}
 
 function calculate(src) {
     var INT = paka.INT;
@@ -85,8 +77,6 @@ function calculate(src) {
     var parser = paka.define(grammar, action);
     var ast = parser.parse('Expr', src);
 
-    //console.log(util.inspect(ast, false, 10));
-    
     if (paka.S.OK == ast.status && ast.length == src.length) {
         console.log(src + ' = ' + ast.extra);
     }
