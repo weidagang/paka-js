@@ -1,0 +1,26 @@
+{
+  "name": "paka",
+  "version": "0.1.0",
+  "description": "Parser combinator for JavaScript",
+  "main": "paka.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "node test/unit-test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/weidagang/paka-js.git"
+  },
+  "keywords": [
+    "parser",
+    "combinator",
+    "parser-combinator"
+  ],
+  "author": "weidagang",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/weidagang/paka-js/issues"
+  }
+}
