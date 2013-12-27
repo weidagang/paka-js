@@ -5,7 +5,7 @@ Paka.js is a higher-order function based parser combinator. Parser combinator is
 
 **Example**
 
-The following code implements a caculator with paka.js in less than 100 lines of JavaScript.
+The following code implements a caculator with paka.js in less than 100 lines of code. With the embedded DSL, the language grammar is very clear and the code is easy to maintain.
 
 ```javascript
 var paka = require('../../paka.js');
