@@ -16,9 +16,9 @@
   "keywords": [
     "parser",
     "combinator",
-    "parser-combinator"
-    "parser combinator"
-    "parser-generator"
+    "parser-combinator",
+    "parser combinator",
+    "parser-generator",
     "parser generator"
   ],
   "author": "weidagang",
