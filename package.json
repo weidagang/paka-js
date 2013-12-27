@@ -17,6 +17,9 @@
     "parser",
     "combinator",
     "parser-combinator"
+    "parser combinator"
+    "parser-generator"
+    "parser generator"
   ],
   "author": "weidagang",
   "license": "MIT",
