@@ -1,5 +1,7 @@
-paka.js: Parser Combinator for JavaScript
-=========================================
+paka.js 
+=======
+
+paka.js is a parser combinator for JavaScript. 
 
 ### Caculator Example ###
 ```javascript
