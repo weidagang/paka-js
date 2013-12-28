@@ -5,6 +5,7 @@
 
     // operator enum
     paka.P = {
+        EOF: 'EOF',
         WS: 'WS',
         RANGE: 'RANGE',
         ALPH: 'ALPH',
@@ -57,6 +58,7 @@
         return {
             parse: function parse(rule, src) {
                 _src = src;
+                _last_error = null;
                 return $(rule)(src, 0);
             }
         };
@@ -64,6 +66,20 @@
     paka.define = define;
 
     // ======== parsers ========
+    // End of source code: matches the end of source code
+    function EOF(buffer, index, depth) {
+        if (index >= buffer.length) {
+            return R.ok(paka.P.EOF, index, 0, null);
+        } else {
+            var r;
+            r = R.error(paka.P.EOF, index, null, "Expects EOF");
+
+            //_update_last_error(r);
+            return r;
+        }
+    }
+    paka.EOF = EOF;
+
     // Whitespace: matches white spaces, example: ' ', '\t'
     function WS(min_len, max_len) {
         if (typeof min_len === "undefined") { min_len = 1; }

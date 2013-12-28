@@ -5,7 +5,9 @@ module paka {
     export var S = { OK : 'OK', ERROR : 'ERROR' };
 
     // operator enum 
-    export var P = { WS : 'WS',
+    export var P = { 
+        EOF : 'EOF',
+        WS : 'WS',
         RANGE : 'RANGE',
         ALPH : 'ALPH', 
         DIGIT : 'DIGIT', 
@@ -71,12 +73,26 @@ module paka {
         return {
             parse : function parse(rule: string, src: string) {
                 _src = src;
+                _last_error = null;
                 return $(rule)(src, 0);
             }
         };
     }
     
     // ======== parsers ========
+    // End of source code: matches the end of source code
+    export function EOF(buffer: string, index: number, depth: number) {
+        if (index >= buffer.length) {
+            return R.ok(P.EOF, index, 0, null);
+        }
+        else {
+            var r: R;
+            r = R.error(P.EOF, index, null, "Expects EOF");
+            //_update_last_error(r);
+            return r;
+        }
+    }
+    
     // Whitespace: matches white spaces, example: ' ', '\t'
     export function WS(min_len: number = 1, max_len: number = Number.MAX_VALUE) {
         return function(buffer: string, index: number, depth: number) {

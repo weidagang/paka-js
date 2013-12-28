@@ -12,6 +12,7 @@ function help() {
 
 function calculate(src) {
     var INT = paka.INT;
+    var EOF = paka.EOF;
     var _SEQ_ = paka._SEQ_;
     var OR = paka.OR;
     var REPEAT = paka.REPEAT;
@@ -19,8 +20,9 @@ function calculate(src) {
     var $ = paka.$;
 
     var grammar = {
-        'Expr' : _SEQ_( $('Term'), $('Terms')),
-        'Term' : _SEQ_( $('Factor'), $('Factors') ),
+        'Arithmetic' : _SEQ_($('Expr'), EOF),
+        'Expr' : _SEQ_($('Term'), $('Terms')),
+        'Term' : _SEQ_($('Factor'), $('Factors') ),
         'Terms' : REPEAT(_SEQ_($('TermOp'), $('Term')), 0),
         'TermOp' : OR('+', '-'),
         'Factor' : OR($('P-Expr'), $('Num')),
@@ -71,21 +73,23 @@ function calculate(src) {
             var terms = r.children[1];
             r.extra = term.extra + (terms != null ? terms.extra : 0);
         },
-        'P-Expr' : function(r) { r.extra = r.children[1].extra; }
+        'P-Expr' : function(r) { r.extra = r.children[1].extra; },
+        'Arithmetic' : function(r) { r.extra = r.children[0].extra; }
     }
 
     var parser = paka.define(grammar, action);
-    var ast = parser.parse('Expr', src);
+    var ast = parser.parse('Arithmetic', src);
 
     //console.log(util.inspect(ast, false, 10));
     
-    if (paka.S.OK == ast.status && ast.length == src.length) {
+    if (paka.S.OK == ast.status) {
         console.log(src + ' = ' + ast.extra);
     }
     else {
-        console.error("Invalid expression, column " + ast.length + ':');
-        var left = src.substring(ast.length - 20, ast.length);
-        var right = src.substring(ast.length, ast.length + 20);
+        var err_idx = paka.last_error().index;
+        console.error("Invalid expression, column " + err_idx + ':');
+        var left = src.substring(err_idx  - 20, err_idx );
+        var right = src.substring(err_idx , err_idx  + 20);
         console.error(left + right);
         var sp = '';
         for (var i = 0; i < left.length; ++i) {
