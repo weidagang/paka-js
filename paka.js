@@ -14,6 +14,7 @@
         UINT: 'UINT',
         STR: 'STR',
         CHAR: 'CHAR',
+        NCHAR: 'NCHAR',
         OR: 'OR',
         SEQ: 'SEQ',
         _SEQ_: '_SEQ_',
@@ -218,7 +219,7 @@
     }
     paka.STR = STR;
 
-    // In: matches any character in the given string
+    // Char: matches any character in the given string
     function CHAR(chars) {
         var _func = 'CHAR("' + chars + '")';
         return function (buffer, index, depth) {
@@ -237,6 +238,26 @@
         };
     }
     paka.CHAR = CHAR;
+
+    // Not Char: matches any character not in the given string
+    function NCHAR(chars) {
+        var _func = 'NCHAR("' + chars + '")';
+        return function (buffer, index, depth) {
+            if (typeof depth === "undefined") { depth = 0; }
+            _trace(_func, depth, true);
+            var r;
+            if (index < buffer.length && chars.indexOf(buffer[index]) < 0) {
+                _trace(_func, depth, false, paka.S.OK);
+                return R.ok(paka.P.NCHAR, index, 1, null);
+            } else {
+                r = R.error(paka.P.NCHAR, index, null, 'Expects a char not in "' + chars + '"');
+                _update_last_error(r);
+                _trace(_func, depth, false, paka.S.ERROR);
+                return r;
+            }
+        };
+    }
+    paka.NCHAR = NCHAR;
 
     // Sequence: matches all the sub-parsers in sequence
     function SEQ() {
@@ -364,6 +385,43 @@
         };
     }
     paka.OR = OR;
+
+    function NOT() {
+        var parsers = [];
+        for (var _i = 0; _i < (arguments.length - 0); _i++) {
+            parsers[_i] = arguments[_i + 0];
+        }
+        var _func = 'OR';
+        return function (buffer, index, depth) {
+            if (typeof depth === "undefined") { depth = 0; }
+            _trace(_func, depth, true);
+            var r;
+            var i;
+            var children;
+
+            children = [];
+
+            for (i = 0; i < parsers.length; ++i) {
+                var parser = _wrap(parsers[i]);
+                var _r;
+
+                _r = parser(buffer, index, depth + 1);
+
+                if (paka.S.OK == _r.status) {
+                    _trace(_func, depth, false, paka.S.OK);
+                    return R.ok(paka.P.OR, index, _r.length, [_r]);
+                } else {
+                    children.push(_r);
+                }
+            }
+
+            r = R.error(paka.P.OR, index, children, 'Failed to match OR');
+            _update_last_error(r);
+            _trace(_func, depth, false, paka.S.ERROR);
+            return r;
+        };
+    }
+    paka.NOT = NOT;
 
     function REPEAT(parser, min_times, max_times) {
         if (typeof min_times === "undefined") { min_times = 0; }

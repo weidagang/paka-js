@@ -16,5 +16,9 @@ paka-unit-test: paka.js
 test-calculator: paka.js
 	node test/calculator/test-calculator.js
 
+.PHONY: test-json-parser
+test-json-parser: paka.js
+	node test/json/test-json-parser.js
+
 .PHONY: test
 test: paka-unit-test

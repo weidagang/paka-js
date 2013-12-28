@@ -15,6 +15,7 @@ module paka {
         UINT : 'UINT', 
         STR : 'STR', 
         CHAR : 'CHAR', 
+        NCHAR : 'NCHAR', 
         OR : 'OR', 
         SEQ : 'SEQ', 
         _SEQ_ : '_SEQ_', 
@@ -218,7 +219,7 @@ module paka {
         };
     }
 
-    // In: matches any character in the given string
+    // Char: matches any character in the given string
     export function CHAR(chars: string) {
         var _func = 'CHAR("' + chars + '")';
         return function(buffer: string, index: number, depth: number = 0): R {
@@ -230,6 +231,25 @@ module paka {
             }
             else {
                 r = R.error(P.CHAR, index, null, 'Expects a char in "' + chars + '"');
+                _update_last_error(r);
+                _trace(_func, depth, false, S.ERROR);
+                return r; 
+            }
+        };
+    }
+
+    // Not Char: matches any character not in the given string
+    export function NCHAR(chars: string) {
+        var _func = 'NCHAR("' + chars + '")';
+        return function(buffer: string, index: number, depth: number = 0): R {
+            _trace(_func, depth, true);
+            var r: R;
+            if (index < buffer.length && chars.indexOf(buffer[index]) < 0) {
+                _trace(_func, depth, false, S.OK);
+                return R.ok(P.NCHAR, index, 1, null);
+            }
+            else {
+                r = R.error(P.NCHAR, index, null, 'Expects a char not in "' + chars + '"');
                 _update_last_error(r);
                 _trace(_func, depth, false, S.ERROR);
                 return r; 
@@ -318,6 +338,38 @@ module paka {
     }
 
     export function OR(...parsers) {
+        var _func = 'OR';
+        return function(buffer: string, index: number, depth: number = 0): R {
+            _trace(_func, depth, true);
+            var r: R;
+            var i: number;
+            var children: R[];
+            
+            children = [];
+
+            for (i = 0; i < parsers.length; ++i) {
+                var parser = _wrap(parsers[i]);
+                var _r: R;
+
+                _r = parser(buffer, index, depth + 1);
+
+                if (S.OK == _r.status) {
+                    _trace(_func, depth, false, S.OK);
+                    return R.ok(P.OR, index, _r.length, [_r]);
+                }
+                else {
+                    children.push(_r);
+                }
+            }
+
+            r = R.error(P.OR, index, children, 'Failed to match OR');
+            _update_last_error(r);
+            _trace(_func, depth, false, S.ERROR);
+            return r;
+        };
+    }
+
+    export function NOT(...parsers) {
         var _func = 'OR';
         return function(buffer: string, index: number, depth: number = 0): R {
             _trace(_func, depth, true);
