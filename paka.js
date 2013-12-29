@@ -12,7 +12,7 @@
         DIGIT: 'DIGIT',
         INT: 'INT',
         UINT: 'UINT',
-        STR: 'STR',
+        SYM: 'SYM',
         CHAR: 'CHAR',
         NCHAR: 'NCHAR',
         OR: 'OR',
@@ -200,24 +200,24 @@
     paka.ALPH = ALPH;
 
     // Symbol: matches a string like "function"
-    function STR(symbol) {
-        var _func = 'STR("' + symbol + '")';
+    function SYM(symbol) {
+        var _func = 'SYM("' + symbol + '")';
         return function (buffer, index, depth) {
             if (typeof depth === "undefined") { depth = 0; }
             _trace(_func, depth, true);
             var r;
             if (index + symbol.length <= buffer.length && index == buffer.indexOf(symbol, index)) {
                 _trace(_func, depth, false, paka.S.OK);
-                return R.ok(paka.P.STR, index, symbol.length, null);
+                return R.ok(paka.P.SYM, index, symbol.length, null);
             } else {
-                r = R.error(paka.P.STR, index, null, 'Expects string "' + symbol + '"');
+                r = R.error(paka.P.SYM, index, null, 'Expects string "' + symbol + '"');
                 _update_last_error(r);
                 _trace(_func, depth, false, paka.S.ERROR);
                 return r;
             }
         };
     }
-    paka.STR = STR;
+    paka.SYM = SYM;
 
     // Char: matches any character in the given string
     function CHAR(chars) {
@@ -523,7 +523,7 @@
     // ======== private methods========
     // return a parser based on the type of arg
     function _wrap(arg) {
-        return ('string' == typeof (arg)) ? STR(arg) : arg;
+        return ('string' == typeof (arg)) ? SYM(arg) : arg;
     }
 
     function _insert_ws_matchers(parsers) {

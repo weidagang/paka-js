@@ -181,31 +181,31 @@ function test_UINT() {
     console.log('Case ' + case_name + ' passed');
 }
 
-function test_STR() {
+function test_SYM() {
     var case_name = arguments.callee.name;
     var case_i = 0;
     console.log('Begin case ' + case_name);
 
-    var STR = paka.STR;
+    var SYM = paka.SYM;
     var S = paka.S;
     var R = paka.R;
     
-    var r = STR("+")("+", 0);
+    var r = SYM("+")("+", 0);
     assert(S.OK == r.status && r.length == 1, case_name + "." + (++case_i));
 
-    var r = STR(" ")(" ", 0);
+    var r = SYM(" ")(" ", 0);
     assert(S.OK == r.status && r.length == 1, case_name + "." + (++case_i));
 
-    var r = STR("foo")("foo", 0);
+    var r = SYM("foo")("foo", 0);
     assert(S.OK == r.status && r.length == 3, case_name + "." + (++case_i));
 
-    var r = STR("foo")(" foo bar", 0);
+    var r = SYM("foo")(" foo bar", 0);
     assert(S.ERROR == r.status, case_name + "." + (++case_i));
 
-    var r = STR("+")(" + ", 0);
+    var r = SYM("+")(" + ", 0);
     assert(S.ERROR == r.status, case_name + "." + (++case_i));
 
-    var r = STR("+")("+", 1);
+    var r = SYM("+")("+", 1);
     assert(S.ERROR == r.status, case_name + "." + (++case_i));
 
     console.log('Case ' + case_name + ' passed');
@@ -244,27 +244,27 @@ function test_SEQ() {
     console.log('Begin case ' + case_name);
 
     var WS = paka.WS ;
-    var STR = paka.STR;
+    var SYM = paka.SYM;
     var SEQ = paka.SEQ;
     var S = paka.S;
     var R = paka.R;
     
-    var r = SEQ(STR('foo'))("foo bar", 0);
+    var r = SEQ(SYM('foo'))("foo bar", 0);
     assert(S.OK == r.status && r.index == 0 && r.length == 3, case_name + "." + (++case_i));
 
     var r = SEQ('foo')("foo bar", 0);
     assert(S.OK == r.status && r.index == 0 && r.length == 3, case_name + "." + (++case_i));
 
-    var r = SEQ(STR('foo'), WS(1), STR('bar'))("foo bar", 0);
+    var r = SEQ(SYM('foo'), WS(1), SYM('bar'))("foo bar", 0);
     assert(S.OK == r.status && r.index == 0 && r.length == 7, case_name + "." + (++case_i));
 
     var r = SEQ('foo', WS(1), 'bar')("foo bar", 0);
     assert(S.OK == r.status && r.index == 0 && r.length == 7, case_name + "." + (++case_i));
 
-    var r = SEQ(SEQ(STR('foo'), WS(1), STR('bar'), STR("=")))("foo bar=", 0);
+    var r = SEQ(SEQ(SYM('foo'), WS(1), SYM('bar'), SYM("=")))("foo bar=", 0);
     assert(S.OK == r.status && r.index == 0 && r.length == 8, case_name + "." + (++case_i));
 
-    var r = SEQ(STR('foo'), WS(1), STR('bar'))("bar foo", 0);
+    var r = SEQ(SYM('foo'), WS(1), SYM('bar'))("bar foo", 0);
     assert(S.ERROR == r.status, case_name + "." + (++case_i));
 
     console.log('Case ' + case_name + ' passed');
@@ -276,12 +276,12 @@ function test_CONCAT() {
     console.log('Begin case ' + case_name);
 
     var WS = paka.WS ;
-    var STR = paka.STR;
+    var SYM = paka.SYM;
     var CONCAT = paka.CONCAT;
     var S = paka.S;
     var R = paka.R;
     
-    var r = CONCAT(STR('foo'))("foo bar", 0);
+    var r = CONCAT(SYM('foo'))("foo bar", 0);
     assert(S.OK == r.status && r.index == 0 && r.length == 4, case_name + "." + (++case_i));
 
     var r = CONCAT('foo', 'bar')(" foo  bar ", 0);
@@ -299,25 +299,25 @@ function test_OR() {
     console.log('Begin case ' + case_name);
 
     var WS = paka.WS ;
-    var STR = paka.STR;
+    var SYM = paka.SYM;
     var SEQ = paka.SEQ;
     var OR = paka.OR;
     var S = paka.S;
     var R = paka.R;
     
-    var r = OR(STR('foo'), STR('ba'))("foo ba", 0);
+    var r = OR(SYM('foo'), SYM('ba'))("foo ba", 0);
     assert(S.OK == r.status && r.length == 3, case_name + "." + (++case_i));
 
-    var r = OR(STR('ba'), STR('foo'))("foo ba", 0);
+    var r = OR(SYM('ba'), SYM('foo'))("foo ba", 0);
     assert(S.OK == r.status && r.length == 3, case_name + "." + (++case_i));
 
-    var r = OR(SEQ(STR('foo'), WS(1), STR('bar')), STR('foo'))("foo bar", 0);
+    var r = OR(SEQ(SYM('foo'), WS(1), SYM('bar')), SYM('foo'))("foo bar", 0);
     assert(S.OK == r.status && r.length == 7, case_name + "." + (++case_i));
 
-    var r = OR(STR('foo'), SEQ(STR('foo'), WS(1), STR('bar')))("foo bar", 0);
+    var r = OR(SYM('foo'), SEQ(SYM('foo'), WS(1), SYM('bar')))("foo bar", 0);
     assert(S.OK == r.status && r.length == 3, case_name + "." + (++case_i));
 
-    var r = OR(STR('foo'), STR('bar'))("fo ba", 0);
+    var r = OR(SYM('foo'), SYM('bar'))("fo ba", 0);
     assert(S.ERROR == r.status, case_name + "." + (++case_i));
 
     console.log('Case ' + case_name + ' passed');
@@ -329,7 +329,7 @@ function test_REPEAT() {
     console.log('Begin case ' + case_name);
 
     var WS = paka.WS ;
-    var STR = paka.STR;
+    var SYM = paka.SYM;
     var SEQ = paka.SEQ;
     var OR = paka.OR;
     var REPEAT = paka.REPEAT;
@@ -337,36 +337,36 @@ function test_REPEAT() {
     var R = paka.R;
     var P = paka.P;
     
-    var r = REPEAT(STR('foo'))(' foofoofoo', 1);
+    var r = REPEAT(SYM('foo'))(' foofoofoo', 1);
     assert(S.OK == r.status && P.REPEAT == r.operator && r.index == 1 && r.length == 9 && r.children.length == 3
         , case_name + "." + (++case_i));
     
     var src = ' foo ha foo ';
-    var r = REPEAT(OR(STR('foo'), STR('ha'), WS()))(src, 0);
+    var r = REPEAT(OR(SYM('foo'), SYM('ha'), WS()))(src, 0);
     assert(S.OK == r.status && P.REPEAT == r.operator && r.index == 0 && r.length == src.length
         , case_name + "." + (++case_i));
 
-    var r = REPEAT(STR('foo'), 3)(' foofoofoo', 1);
+    var r = REPEAT(SYM('foo'), 3)(' foofoofoo', 1);
     assert(S.OK == r.status && P.REPEAT == r.operator && r.index == 1 && r.length == 9
         , case_name + "." + (++case_i));
 
-    var r = REPEAT(STR('foo'), 3)(' foofoofoo', 1);
+    var r = REPEAT(SYM('foo'), 3)(' foofoofoo', 1);
     assert(S.OK == r.status && P.REPEAT == r.operator && r.index == 1 && r.length == 9 && r.children.length == 3
         , case_name + "." + (++case_i));
 
-    var r = REPEAT(STR('foo'), 1, 2)(' foofoofoo', 1);
+    var r = REPEAT(SYM('foo'), 1, 2)(' foofoofoo', 1);
     assert(S.OK == r.status && P.REPEAT == r.operator  && r.index == 1 && r.length == 6 && r.children.length == 2
         , case_name + "." + (++case_i));
 
-    var r = REPEAT(STR('foo'), 0, 2)('blabla foo', 0);
+    var r = REPEAT(SYM('foo'), 0, 2)('blabla foo', 0);
     assert(S.OK == r.status && P.REPEAT == r.operator && r.index == 0 && r.length == 0 && r.children.length == 0
         , case_name + "." + (++case_i));
 
-    var r = REPEAT(STR('foo'))(' foofoofoo', 0);
+    var r = REPEAT(SYM('foo'))(' foofoofoo', 0);
     assert(S.OK == r.status && P.REPEAT == r.operator && r.children.length == 0
         , case_name + "." + (++case_i));
 
-    var r = REPEAT(STR('foo'), 4)(' foofoofoo', 1);
+    var r = REPEAT(SYM('foo'), 4)(' foofoofoo', 1);
     assert(S.ERROR == r.status && P.REPEAT == r.operator && r.children.length == 3
         , case_name + "." + (++case_i));
 
@@ -379,7 +379,7 @@ function test_OPT() {
     console.log('Begin case ' + case_name);
 
     var WS = paka.WS ;
-    var STR = paka.STR;
+    var SYM = paka.SYM;
     var SEQ = paka.SEQ;
     var OR = paka.OR;
     var REPEAT = paka.REPEAT;
@@ -388,19 +388,19 @@ function test_OPT() {
     var R = paka.R;
     var P = paka.P;
     
-    var r = OPT(STR('foo'))('foo bar', 0);
+    var r = OPT(SYM('foo'))('foo bar', 0);
     assert(S.OK == r.status && P.OPT == r.operator && r.index == 0 && r.length == 3 && r.children.length == 1
         , case_name + "." + (++case_i));
 
-    var r = OPT(STR('foo'))('bar foo', 0);
+    var r = OPT(SYM('foo'))('bar foo', 0);
     assert(S.OK == r.status && P.OPT == r.operator && r.index == 0 && r.length == 0 && r.children.length == 0
         , case_name + "." + (++case_i));
 
-    var r = SEQ(STR('foo'), OPT(WS()), STR('+'), OPT(WS()), STR('bar'))('foo+bar', 0);
+    var r = SEQ(SYM('foo'), OPT(WS()), SYM('+'), OPT(WS()), SYM('bar'))('foo+bar', 0);
     assert(S.OK == r.status && P.SEQ == r.operator && r.index == 0 && r.length == 7 && r.children.length == 5
         , case_name + "." + (++case_i));
 
-    var r = SEQ(STR('foo'), OPT(WS()), STR('+'), OPT(WS()), STR('bar'))('foo + bar', 0);
+    var r = SEQ(SYM('foo'), OPT(WS()), SYM('+'), OPT(WS()), SYM('bar'))('foo + bar', 0);
     assert(S.OK == r.status && P.SEQ == r.operator && r.index == 0 && r.length == 9 && r.children.length == 5
         , case_name + "." + (++case_i));
 
@@ -413,7 +413,7 @@ function test_$() {
     console.log('Begin case ' + case_name);
 
     var WS = paka.WS ;
-    var STR = paka.STR;
+    var SYM = paka.SYM;
     var SEQ = paka.SEQ;
     var OR = paka.OR;
     var REPEAT = paka.REPEAT;
@@ -424,9 +424,9 @@ function test_$() {
     var P = paka.P;
 
     var grammar = {
-        'C' : SEQ($('A'), STR('+'), $('B')),
-        'A' : STR('foo'),
-        'B' : STR('bar')
+        'C' : SEQ($('A'), SYM('+'), $('B')),
+        'A' : SYM('foo'),
+        'B' : SYM('bar')
     };
 
     var parser = paka.define(grammar);
@@ -446,7 +446,7 @@ test_ALPH();
 test_DIGIT();
 test_INT();
 test_UINT();
-test_STR();
+test_SYM();
 test_CHAR();
 test_SEQ();
 test_CONCAT();

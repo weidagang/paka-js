@@ -13,7 +13,7 @@ module paka {
         DIGIT : 'DIGIT', 
         INT : 'INT', 
         UINT : 'UINT', 
-        STR : 'STR', 
+        SYM : 'SYM', 
         CHAR : 'CHAR', 
         NCHAR : 'NCHAR', 
         OR : 'OR', 
@@ -201,17 +201,17 @@ module paka {
     }
 
     // Symbol: matches a string like "function"
-    export function STR(symbol: string) {
-        var _func = 'STR("' + symbol + '")';
+    export function SYM(symbol: string) {
+        var _func = 'SYM("' + symbol + '")';
         return function(buffer: string, index: number, depth: number = 0) {
             _trace(_func, depth, true);
             var r: R;
             if (index + symbol.length <= buffer.length && index == buffer.indexOf(symbol, index)) {
                 _trace(_func, depth, false, S.OK);
-                return R.ok(P.STR, index, symbol.length, null);
+                return R.ok(P.SYM, index, symbol.length, null);
             }
             else {
-                r = R.error(P.STR, index, null, 'Expects string "' + symbol + '"');
+                r = R.error(P.SYM, index, null, 'Expects string "' + symbol + '"');
                 _update_last_error(r);
                 _trace(_func, depth, false, S.ERROR);
                 return r;
@@ -494,7 +494,7 @@ module paka {
     // ======== private methods======== 
     // return a parser based on the type of arg 
     function _wrap(arg) {
-        return ('string' == typeof(arg)) ? STR(arg) : arg;
+        return ('string' == typeof(arg)) ? SYM(arg) : arg;
     }
 
     function _insert_ws_matchers(parsers) {

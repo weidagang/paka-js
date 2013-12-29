@@ -17,7 +17,6 @@ function parse(src) {
     var OR = paka.OR;
     var REPEAT = paka.REPEAT;
     var OPT = paka.OPT;
-    var STR = paka.STR;
     var CHAR = paka.CHAR;
     var NCHAR = paka.NCHAR;
     var $ = paka.$;
