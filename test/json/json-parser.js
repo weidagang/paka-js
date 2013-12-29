@@ -29,7 +29,7 @@ function parse(src) {
         'Key' : $('String'),
         'Value' : OR($('Num'), $('Null'), $('Bool'), $('String')),
         'Num' : INT(),
-        'Null' : STR('null'),
+        'Null' : 'null',
         'Bool' : OR('false', 'true'),
         'String' : _SEQ_('"', REPEAT(NCHAR('"'), 0), '"')
     };
