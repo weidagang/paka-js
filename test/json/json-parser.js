@@ -17,8 +17,7 @@ function parse(src) {
     var OR = paka.OR;
     var REPEAT = paka.REPEAT;
     var OPT = paka.OPT;
-    var CHAR = paka.CHAR;
-    var NCHAR = paka.NCHAR;
+    var DQ_STR = paka.DQ_STR;
     var $ = paka.$;
 
     var grammar = {
@@ -30,7 +29,7 @@ function parse(src) {
         'Num' : INT(),
         'Null' : 'null',
         'Bool' : OR('false', 'true'),
-        'String' : CONCAT('"', REPEAT(NCHAR('"'), 0), '"')
+        'String' : DQ_STR()
     };
 
     var action = {

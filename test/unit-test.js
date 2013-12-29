@@ -211,6 +211,68 @@ function test_SYM() {
     console.log('Case ' + case_name + ' passed');
 }
 
+function test_DQ_STR() {
+    var case_name = arguments.callee.name;
+    var case_i = 0;
+    console.log('Begin case ' + case_name);
+
+    var DQ_STR = paka.DQ_STR;
+    var S = paka.S;
+    var R = paka.R;
+    var P = paka.P;
+    
+    var r = DQ_STR()('"a,b;c.d e-f+"', 0);
+    assert(S.OK == r.status && P.DQ_STR == r.operator && r.length == 14, case_name + "." + (++case_i));
+
+    var r = DQ_STR()('"a\\"b"', 0);
+    assert(S.OK == r.status && P.DQ_STR == r.operator && r.length == 6, case_name + "." + (++case_i));
+
+    var r = DQ_STR()('"\\\\"', 0);
+    assert(S.OK == r.status && P.DQ_STR == r.operator && r.length == 4, case_name + "." + (++case_i));
+    
+    var r = DQ_STR()('"\\\\""', 0);
+    assert(S.OK == r.status && P.DQ_STR == r.operator && r.length == 4, case_name + "." + (++case_i));
+
+    var r = DQ_STR()('"abc', 0);
+    assert(S.ERROR == r.status && P.DQ_STR == r.operator, case_name + "." + (++case_i));
+
+    var r = DQ_STR()('abc"', 0);
+    assert(S.ERROR == r.status && P.DQ_STR == r.operator, case_name + "." + (++case_i));
+
+    console.log('Case ' + case_name + ' passed');
+}
+
+function test_SQ_STR() {
+    var case_name = arguments.callee.name;
+    var case_i = 0;
+    console.log('Begin case ' + case_name);
+
+    var SQ_STR = paka.SQ_STR;
+    var S = paka.S;
+    var R = paka.R;
+    var P = paka.P;
+    
+    var r = SQ_STR()("'a,b;c.d e-f+'", 0);
+    assert(S.OK == r.status && P.SQ_STR == r.operator && r.length == 14, case_name + "." + (++case_i));
+
+    var r = SQ_STR()("'a\\'b'", 0);
+    assert(S.OK == r.status && P.SQ_STR == r.operator && r.length == 6, case_name + "." + (++case_i));
+
+    var r = SQ_STR()("'\\\\'", 0);
+    assert(S.OK == r.status && P.SQ_STR == r.operator && r.length == 4, case_name + "." + (++case_i));
+    
+    var r = SQ_STR()("'\\\\''", 0);
+    assert(S.OK == r.status && P.SQ_STR == r.operator && r.length == 4, case_name + "." + (++case_i));
+
+    var r = SQ_STR()("'abc", 0);
+    assert(S.ERROR == r.status && P.SQ_STR == r.operator, case_name + "." + (++case_i));
+
+    var r = SQ_STR()("abc'", 0);
+    assert(S.ERROR == r.status && P.SQ_STR == r.operator, case_name + "." + (++case_i));
+
+    console.log('Case ' + case_name + ' passed');
+}
+
 function test_CHAR() {
     var case_name = arguments.callee.name;
     var case_i = 0;
@@ -447,6 +509,8 @@ test_DIGIT();
 test_INT();
 test_UINT();
 test_SYM();
+test_DQ_STR();
+test_SQ_STR();
 test_CHAR();
 test_SEQ();
 test_CONCAT();

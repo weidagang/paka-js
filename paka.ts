@@ -6,23 +6,26 @@ module paka {
 
     // operator enum 
     export var P = { 
-        EOF : 'EOF',
-        WS : 'WS',
-        RANGE : 'RANGE',
-        ALPH : 'ALPH', 
-        DIGIT : 'DIGIT', 
-        INT : 'INT', 
-        UINT : 'UINT', 
-        SYM : 'SYM', 
-        CHAR : 'CHAR', 
-        NCHAR : 'NCHAR', 
-        OR : 'OR', 
-        SEQ : 'SEQ', 
-        CONCAT : 'CONCAT', 
-        REPEAT : 'REPEAT', 
-        OPT : 'OPT', 
-        RULE : 'RULE',
-        PERMU : 'PERMU' 
+        EOF : 'EOF', // end of file
+        WS : 'WS', // white space
+        RANGE : 'RANGE', // range
+        ALPH : 'ALPH', //alphabet
+        DIGIT : 'DIGIT', // digit
+        INT : 'INT', // signed integer
+        UINT : 'UINT', // unsigned integer
+        SYM : 'SYM', // symbol
+        CHAR : 'CHAR', // char in set
+        NCHAR : 'NCHAR', // char not in set
+        Q_STR : 'Q_STR', // quoted string
+        DQ_STR : 'DQ_STR', // double quoted string
+        SQ_STR : 'SQ_STR', // single quoted string
+        OR : 'OR', // or
+        SEQ : 'SEQ', // sequence 
+        CONCAT : 'CONCAT', // concatenate (ignore white spaces)
+        REPEAT : 'REPEAT', // repeat
+        OPT : 'OPT', // optional
+        RULE : 'RULE', // rule
+        PERMU : 'PERMU' // permutation
     };
 
     // parsing result
@@ -217,6 +220,25 @@ module paka {
                 return r;
             }
         };
+    }
+    
+    // Quoted string: matches a quoted string, example: "a b c", 'a b c'
+    export function Q_STR(quote: string) {
+        if ('string' != typeof(quote) || 1 != quote.length) {
+            throw 'Invalid quote for Q_STR';
+        }
+        var _parser = SEQ(quote, REPEAT(OR('\\\\', '\\' + quote, NCHAR(quote))), quote);
+        return _make_alias('Q_STR(' + quote + ')', P.Q_STR, _parser);
+    }
+
+    // Double quoted string: matches a double quoted string "a b 1"
+    export function DQ_STR() {
+        return _make_alias('DQ_STR()' , P.DQ_STR, Q_STR('"'));
+    }
+
+    // Single quoted string: matches a single quoted string 'a b 1'
+    export function SQ_STR() {
+        return _make_alias('SQ_STR()' , P.SQ_STR, Q_STR("'"));
     }
 
     // Char: matches any character in the given string
@@ -527,6 +549,28 @@ module paka {
             }
             console.log(msg);
         }
+    }
+
+    function _make_alias(name: string, operator: string, parser: Function) {
+        var _name = name;
+        var _parser = parser;
+
+        return function(buffer: string, index: number, depth: number = 0) {
+            _trace(_name, depth, true);
+
+            var r: R = _parser(buffer, index, depth);
+
+            if (S.OK == r.status) {
+                r = R.ok(operator, r.index, r.length, null);
+            }
+            else {
+                r = R.error(operator, index, null, null);
+            }
+
+            (S.ERROR == r.status) && _update_last_error(r);
+            _trace(_name, depth, false, r.status);
+            return r;
+        };
     }
 
     function _log(message: string, depth: number = 0) {

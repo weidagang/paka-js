@@ -15,6 +15,9 @@
         SYM: 'SYM',
         CHAR: 'CHAR',
         NCHAR: 'NCHAR',
+        Q_STR: 'Q_STR',
+        DQ_STR: 'DQ_STR',
+        SQ_STR: 'SQ_STR',
         OR: 'OR',
         SEQ: 'SEQ',
         CONCAT: 'CONCAT',
@@ -218,6 +221,28 @@
         };
     }
     paka.SYM = SYM;
+
+    // Quoted string: matches a quoted string, example: "a b c", 'a b c'
+    function Q_STR(quote) {
+        if ('string' != typeof (quote) || 1 != quote.length) {
+            throw 'Invalid quote for Q_STR';
+        }
+        var _parser = SEQ(quote, REPEAT(OR('\\\\', '\\' + quote, NCHAR(quote))), quote);
+        return _make_alias('Q_STR(' + quote + ')', paka.P.Q_STR, _parser);
+    }
+    paka.Q_STR = Q_STR;
+
+    // Double quoted string: matches a double quoted string "a b 1"
+    function DQ_STR() {
+        return _make_alias('DQ_STR()', paka.P.DQ_STR, Q_STR('"'));
+    }
+    paka.DQ_STR = DQ_STR;
+
+    // Single quoted string: matches a single quoted string 'a b 1'
+    function SQ_STR() {
+        return _make_alias('SQ_STR()', paka.P.SQ_STR, Q_STR("'"));
+    }
+    paka.SQ_STR = SQ_STR;
 
     // Char: matches any character in the given string
     function CHAR(chars) {
@@ -557,6 +582,28 @@
             }
             console.log(msg);
         }
+    }
+
+    function _make_alias(name, operator, parser) {
+        var _name = name;
+        var _parser = parser;
+
+        return function (buffer, index, depth) {
+            if (typeof depth === "undefined") { depth = 0; }
+            _trace(_name, depth, true);
+
+            var r = _parser(buffer, index, depth);
+
+            if (paka.S.OK == r.status) {
+                r = R.ok(operator, r.index, r.length, null);
+            } else {
+                r = R.error(operator, index, null, null);
+            }
+
+            (paka.S.ERROR == r.status) && _update_last_error(r);
+            _trace(_name, depth, false, r.status);
+            return r;
+        };
     }
 
     function _log(message, depth) {
