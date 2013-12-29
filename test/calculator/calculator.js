@@ -13,22 +13,22 @@ function help() {
 function calculate(src) {
     var INT = paka.INT;
     var EOF = paka.EOF;
-    var _SEQ_ = paka._SEQ_;
+    var CONCAT = paka.CONCAT;
     var OR = paka.OR;
     var REPEAT = paka.REPEAT;
     var OPT = paka.OPT;
     var $ = paka.$;
 
     var grammar = {
-        'Arithmetic' : _SEQ_($('Expr'), EOF),
-        'Expr' : _SEQ_($('Term'), $('Terms')),
-        'Term' : _SEQ_($('Factor'), $('Factors') ),
-        'Terms' : REPEAT(_SEQ_($('TermOp'), $('Term')), 0),
+        'Arithmetic' : CONCAT($('Expr'), EOF),
+        'Expr' : CONCAT($('Term'), $('Terms')),
+        'Term' : CONCAT($('Factor'), $('Factors') ),
+        'Terms' : REPEAT(CONCAT($('TermOp'), $('Term')), 0),
         'TermOp' : OR('+', '-'),
         'Factor' : OR($('P-Expr'), $('Num')),
-        'Factors' : REPEAT(_SEQ_($('FactorOp'), $('Factor')), 0),
+        'Factors' : REPEAT(CONCAT($('FactorOp'), $('Factor')), 0),
         'FactorOp' : OR('*', '/'),
-        'P-Expr' : _SEQ_('(', $('Expr'), ')'),
+        'P-Expr' : CONCAT('(', $('Expr'), ')'),
         'Num' : INT()
     };
 

@@ -18,7 +18,7 @@ module paka {
         NCHAR : 'NCHAR', 
         OR : 'OR', 
         SEQ : 'SEQ', 
-        _SEQ_ : '_SEQ_', 
+        CONCAT : 'CONCAT', 
         REPEAT : 'REPEAT', 
         OPT : 'OPT', 
         RULE : 'RULE',
@@ -158,7 +158,7 @@ module paka {
         var _func = 'INT';
         return function(buffer: string, index: number, depth: number = 0) {
             _trace(_func, depth, true);
-            var parser = _SEQ_(OPT(OR('+', '-')), REPEAT(DIGIT(), 1, max_len));
+            var parser = CONCAT(OPT(OR('+', '-')), REPEAT(DIGIT(), 1, max_len));
             var r = parser(buffer, index, depth);
             r.operator = P.INT;
             _trace(_func, depth, false, r.status);
@@ -171,7 +171,7 @@ module paka {
         var _func = 'UINT';
         return function(buffer: string, index: number, depth: number = 0) {
             _trace(_func, depth, true);
-            var parser = _SEQ_(REPEAT(DIGIT(), 1, max_len));
+            var parser = CONCAT(REPEAT(DIGIT(), 1, max_len));
             var r = parser(buffer, index, depth);
             r.operator = P.UINT;
             _trace(_func, depth, false, r.status);
@@ -295,9 +295,9 @@ module paka {
     }
 
     // Sequence: matches all the sub-parsers in sequence ignore whitespaces between them
-    export function _SEQ_(...parsers) {
-        var _func = '_SEQ_';
-        var _parsers = _wrap_ignore_ws(parsers);
+    export function CONCAT(...parsers) {
+        var _func = 'CONCAT';
+        var _parsers = _insert_ws_matchers(parsers);
 
         return function(buffer: string, index: number, depth: number = 0): R {
             _trace(_func, depth, true);
@@ -325,7 +325,7 @@ module paka {
                     idx += r.length;
                 }
                 else {
-                    r = R.error(P._SEQ_, idx, children, r.err);
+                    r = R.error(P.CONCAT, idx, children, r.err);
                     _update_last_error(r);
                     _trace(_func, depth, false, S.ERROR);
                     return r;
@@ -333,7 +333,7 @@ module paka {
             }
 
             _trace(_func, depth, false, S.OK);
-            return R.ok(P._SEQ_, index, idx - index, children);
+            return R.ok(P.CONCAT, index, idx - index, children);
         };
     }
 
@@ -497,7 +497,7 @@ module paka {
         return ('string' == typeof(arg)) ? STR(arg) : arg;
     }
 
-    function _wrap_ignore_ws(parsers) {
+    function _insert_ws_matchers(parsers) {
         var _parsers = [];
         var _ws = WS(0);
         _parsers.push(_ws);

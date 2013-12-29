@@ -270,24 +270,24 @@ function test_SEQ() {
     console.log('Case ' + case_name + ' passed');
 }
 
-function test_SEQ_() {
+function test_CONCAT() {
     var case_name = arguments.callee.name;
     var case_i = 0;
     console.log('Begin case ' + case_name);
 
     var WS = paka.WS ;
     var STR = paka.STR;
-    var _SEQ_ = paka._SEQ_;
+    var CONCAT = paka.CONCAT;
     var S = paka.S;
     var R = paka.R;
     
-    var r = _SEQ_(STR('foo'))("foo bar", 0);
+    var r = CONCAT(STR('foo'))("foo bar", 0);
     assert(S.OK == r.status && r.index == 0 && r.length == 4, case_name + "." + (++case_i));
 
-    var r = _SEQ_('foo', 'bar')(" foo  bar ", 0);
+    var r = CONCAT('foo', 'bar')(" foo  bar ", 0);
     assert(S.OK == r.status && r.index == 0 && r.length == 10, case_name + "." + (++case_i));
 
-    var r = _SEQ_('foo', '+', 'bar')("foo + bar", 0);
+    var r = CONCAT('foo', '+', 'bar')("foo + bar", 0);
     assert(S.OK == r.status && r.index == 0 && r.length == 9, case_name + "." + (++case_i));
 
     console.log('Case ' + case_name + ' passed');
@@ -449,7 +449,7 @@ test_UINT();
 test_STR();
 test_CHAR();
 test_SEQ();
-test_SEQ_();
+test_CONCAT();
 test_OR();
 test_REPEAT();
 test_OPT();

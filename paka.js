@@ -17,7 +17,7 @@
         NCHAR: 'NCHAR',
         OR: 'OR',
         SEQ: 'SEQ',
-        _SEQ_: '_SEQ_',
+        CONCAT: 'CONCAT',
         REPEAT: 'REPEAT',
         OPT: 'OPT',
         RULE: 'RULE',
@@ -152,7 +152,7 @@
         return function (buffer, index, depth) {
             if (typeof depth === "undefined") { depth = 0; }
             _trace(_func, depth, true);
-            var parser = _SEQ_(OPT(OR('+', '-')), REPEAT(DIGIT(), 1, max_len));
+            var parser = CONCAT(OPT(OR('+', '-')), REPEAT(DIGIT(), 1, max_len));
             var r = parser(buffer, index, depth);
             r.operator = paka.P.INT;
             _trace(_func, depth, false, r.status);
@@ -168,7 +168,7 @@
         return function (buffer, index, depth) {
             if (typeof depth === "undefined") { depth = 0; }
             _trace(_func, depth, true);
-            var parser = _SEQ_(REPEAT(DIGIT(), 1, max_len));
+            var parser = CONCAT(REPEAT(DIGIT(), 1, max_len));
             var r = parser(buffer, index, depth);
             r.operator = paka.P.UINT;
             _trace(_func, depth, false, r.status);
@@ -302,13 +302,13 @@
     paka.SEQ = SEQ;
 
     // Sequence: matches all the sub-parsers in sequence ignore whitespaces between them
-    function _SEQ_() {
+    function CONCAT() {
         var parsers = [];
         for (var _i = 0; _i < (arguments.length - 0); _i++) {
             parsers[_i] = arguments[_i + 0];
         }
-        var _func = '_SEQ_';
-        var _parsers = _wrap_ignore_ws(parsers);
+        var _func = 'CONCAT';
+        var _parsers = _insert_ws_matchers(parsers);
 
         return function (buffer, index, depth) {
             if (typeof depth === "undefined") { depth = 0; }
@@ -336,7 +336,7 @@
                 if (paka.S.OK == r.status) {
                     idx += r.length;
                 } else {
-                    r = R.error(paka.P._SEQ_, idx, children, r.err);
+                    r = R.error(paka.P.CONCAT, idx, children, r.err);
                     _update_last_error(r);
                     _trace(_func, depth, false, paka.S.ERROR);
                     return r;
@@ -344,10 +344,10 @@
             }
 
             _trace(_func, depth, false, paka.S.OK);
-            return R.ok(paka.P._SEQ_, index, idx - index, children);
+            return R.ok(paka.P.CONCAT, index, idx - index, children);
         };
     }
-    paka._SEQ_ = _SEQ_;
+    paka.CONCAT = CONCAT;
 
     function OR() {
         var parsers = [];
@@ -526,7 +526,7 @@
         return ('string' == typeof (arg)) ? STR(arg) : arg;
     }
 
-    function _wrap_ignore_ws(parsers) {
+    function _insert_ws_matchers(parsers) {
         var _parsers = [];
         var _ws = WS(0);
         _parsers.push(_ws);

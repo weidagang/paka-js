@@ -13,7 +13,7 @@ function help() {
 function parse(src) {
     var INT = paka.INT;
     var EOF = paka.EOF;
-    var _SEQ_ = paka._SEQ_;
+    var CONCAT = paka.CONCAT;
     var OR = paka.OR;
     var REPEAT = paka.REPEAT;
     var OPT = paka.OPT;
@@ -23,15 +23,15 @@ function parse(src) {
     var $ = paka.$;
 
     var grammar = {
-        'JSON' : _SEQ_('{', OPT($('KeyValueList')), '}', EOF),
-        'KeyValueList' : _SEQ_($('KeyValuePair'), REPEAT(_SEQ_(',', $('KeyValuePair')), 0)),
-        'KeyValuePair' : _SEQ_($('Key'), ':', $('Value')),
+        'JSON' : CONCAT('{', OPT($('KeyValueList')), '}', EOF),
+        'KeyValueList' : CONCAT($('KeyValuePair'), REPEAT(CONCAT(',', $('KeyValuePair')), 0)),
+        'KeyValuePair' : CONCAT($('Key'), ':', $('Value')),
         'Key' : $('String'),
         'Value' : OR($('Num'), $('Null'), $('Bool'), $('String')),
         'Num' : INT(),
         'Null' : 'null',
         'Bool' : OR('false', 'true'),
-        'String' : _SEQ_('"', REPEAT(NCHAR('"'), 0), '"')
+        'String' : CONCAT('"', REPEAT(NCHAR('"'), 0), '"')
     };
 
     var action = {
