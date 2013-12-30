@@ -3,7 +3,9 @@ paka.js
 
 Paka.js is a higher-order function based parser combinator. It's designed for creating language parsers in JavaScript. Unlike external parser generators such as ANTLR, there's no static code generation involved. When writing language parsers in JavaScript, you can define the language grammar and semantics actions with an embedded DSL, it is much light-weighted than external parser generators.
 
-**Example**
+### Example ###
+
+** Caculator **
 
 The following code implements a working caculator in less than 100 lines of code. The hightlight is that the language grammar is written in the embedded DSL, it's clean and easy to maintain.
 
@@ -71,5 +73,64 @@ function calculate(src) {
     else {
         console.error('Invalid expression');
     }
+}
+```
+
+** JSON Parser **
+
+The following code implements a JSON parser which creates a JSON object from its string representation. 
+
+```javascript
+function parse(src) {
+    var INT = paka.INT;
+    var EOF = paka.EOF;
+    var CONCAT = paka.CONCAT;
+    var OR = paka.OR;
+    var REPEAT = paka.REPEAT;
+    var OPT = paka.OPT;
+    var DQ_STR = paka.DQ_STR;
+    var ENCLOSED_LIST = paka.ENCLOSED_LIST;
+    var $ = paka.$;
+    
+    var grammar = {
+        'JSON' : CONCAT($('Value'), EOF),
+        'Value' : OR($('Num'), $('Null'), $('Bool'), $('String'), $('Object'), $('Array')),
+        'Object' : ENCLOSED_LIST('{', $('KeyValuePair'), ',', '}'),
+        'KeyValuePair' : CONCAT($('Key'), ':', $('Value')),
+        'Key' : $('String'),
+        'Num' : INT(),
+        'Null' : 'null',
+        'Bool' : OR('false', 'true'),
+        'String' : DQ_STR(),
+        'Array' : ENCLOSED_LIST('[', $('Value'), ',', ']')
+    };
+
+    var actions = {
+        'Num' : function(r) { r.extra = parseInt(r.text()); },
+        'Null' : function(r) { r.extra = null },
+        'Bool' : function(r) { r.extra = ('true' == r.text()); },
+        'String' : function(r) { r.extra = escape_str(r.text()); },
+        'Key' : function(r) { },
+        'Value' : function(r) { r.extra = r.children[0].extra; },
+        'KeyValuePair' : function(r) { r.extra = { key : r.children[0].extra, value : r.children[2].extra }; },
+        'Object' : function(r) { 
+            r.extra = {};
+            for (var i = 0; null != r.children && i < r.children.length; ++i) {
+                r.extra[r.children[i].extra.key] = r.children[i].extra.value;
+            }
+        },
+        'Array' : function(r) {
+            r.extra = [];
+            for (var i = 0; null != r.children && i < r.children.length; ++i) {
+                r.extra.push(r.children[i].extra);
+            }
+        },
+        'JSON' : function(r) { r.extra = r.children[0].extra; }
+    }
+
+    var parser = paka.define(grammar, actions);
+    var ast = parser.parse('JSON', src);
+
+    return ast;
 }
 ```
