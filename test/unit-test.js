@@ -469,6 +469,57 @@ function test_OPT() {
     console.log('Case ' + case_name + ' passed');
 }
 
+function test_LIST() {
+    var case_name = arguments.callee.name;
+    var case_i = 0;
+    console.log('Begin case ' + case_name);
+
+    var LIST = paka.LIST;
+    var INT = paka.INT;
+    var $ = paka.$;
+
+    var S = paka.S;
+    var R = paka.R;
+    var P = paka.P;
+    
+    var r = LIST(INT(), ',')('123, 234, 456', 0);
+    assert(S.OK == r.status);
+    assert(P.LIST == r.operator);
+    assert(r.index == 0 && r.length == 13);
+    assert(r.children.length == 3);
+    assert(r.children[0].operator == P.INT);
+    assert(r.children[1].operator == P.INT);
+    assert(r.children[2].operator == P.INT);
+
+    var r = LIST(INT(), ',')('123, 234, 456,', 0);
+    assert(S.OK == r.status);
+    assert(P.LIST == r.operator);
+    assert(r.index == 0 && r.length == 13);
+    assert(r.children.length == 3);
+    assert(r.children[0].operator == P.INT);
+    assert(r.children[1].operator == P.INT);
+    assert(r.children[2].operator == P.INT);
+
+    console.log('Case ' + case_name + ' passed');
+
+    var r = LIST(INT(), ',')(' 123, 234, 456,', 0);
+    assert(S.OK == r.status);
+    assert(P.LIST == r.operator);
+    assert(r.index == 0 && r.length == 14);
+    assert(r.children.length == 3);
+    assert(r.children[0].operator == P.INT);
+    assert(r.children[1].operator == P.INT);
+    assert(r.children[2].operator == P.INT);
+
+    var r = LIST(INT(), ',')(' abc, 234, 456,', 0);
+    assert(S.ERROR == r.status);
+    assert(P.LIST == r.operator);
+    assert(r.index == 0 && r.length == 0);
+    assert(r.children == null);
+
+    console.log('Case ' + case_name + ' passed');
+}
+
 function test_$() {
     var case_name = arguments.callee.name;
     var case_i = 0;
@@ -517,4 +568,5 @@ test_CONCAT();
 test_OR();
 test_REPEAT();
 test_OPT();
+test_LIST();
 test_$();

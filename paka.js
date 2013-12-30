@@ -21,6 +21,7 @@
         OR: 'OR',
         SEQ: 'SEQ',
         CONCAT: 'CONCAT',
+        LIST: 'LIST',
         REPEAT: 'REPEAT',
         OPT: 'OPT',
         RULE: 'RULE',
@@ -373,6 +374,39 @@
         };
     }
     paka.CONCAT = CONCAT;
+
+    // List: matches a list of elements separated by a delimiter, example "a, b, c"
+    function LIST(element_parser, delimiter_parser) {
+        var _func = 'LIST';
+        var _parser = CONCAT(element_parser, REPEAT(CONCAT(delimiter_parser, element_parser), 0));
+
+        return function (buffer, index, depth) {
+            if (typeof depth === "undefined") { depth = 0; }
+            _trace(_func, depth, true);
+
+            var r;
+            var _r = _parser(buffer, index, depth);
+
+            if (paka.S.OK == _r.status) {
+                var _children = [];
+
+                _children.push(_r.children[0]);
+
+                for (var i = 0; i < _r.children[1].children.length; ++i) {
+                    _children.push(_r.children[1].children[i].children[1]);
+                }
+
+                r = R.ok(paka.P.LIST, index, _r.length, _children);
+            } else {
+                r = R.error(paka.P.LIST, index, null, 'Failed to match LIST');
+            }
+
+            paka.S.ERROR == r.status && _update_last_error(r);
+            _trace(_func, depth, false, r.status);
+            return r;
+        };
+    }
+    paka.LIST = LIST;
 
     function OR() {
         var parsers = [];

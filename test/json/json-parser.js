@@ -22,13 +22,14 @@ function parse(src) {
     var REPEAT = paka.REPEAT;
     var OPT = paka.OPT;
     var DQ_STR = paka.DQ_STR;
+    var LIST = paka.LIST;
     var $ = paka.$;
     
 
     var grammar = {
         'JSON' : CONCAT($('Object'), EOF),
         'Object' : CONCAT('{', OPT($('KeyValueList')), '}'),
-        'KeyValueList' : CONCAT($('KeyValuePair'), REPEAT(CONCAT(',', $('KeyValuePair')), 0)),
+        'KeyValueList' : LIST($('KeyValuePair'), ','),
         'KeyValuePair' : CONCAT($('Key'), ':', $('Value')),
         'Key' : $('String'),
         'Value' : OR($('Num'), $('Null'), $('Bool'), $('String'), $('Object')),
@@ -48,10 +49,8 @@ function parse(src) {
         'KeyValuePair' : function(r) { r.extra = { key : r.children[0].extra, value : r.children[2].extra }; },
         'KeyValueList' : function(r) { 
             r.extra = {};
-            r.extra[r.children[0].extra.key] = r.children[0].extra.value;
-            for (var i = 0; i < r.children[1].children.length; ++i) {
-                var kv = r.children[1].children[i].children[1];
-                r.extra[kv.extra.key] = kv.extra.value;
+            for (var i = 0; i < r.children.length; ++i) {
+                r.extra[r.children[i].extra.key] = r.children[i].extra.value;
             }
         },
         'Object' : function(r) { 

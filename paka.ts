@@ -22,6 +22,7 @@ module paka {
         OR : 'OR', // or
         SEQ : 'SEQ', // sequence 
         CONCAT : 'CONCAT', // concatenate (ignore white spaces)
+        LIST : 'LIST', // list 
         REPEAT : 'REPEAT', // repeat
         OPT : 'OPT', // optional
         RULE : 'RULE', // rule
@@ -356,6 +357,38 @@ module paka {
 
             _trace(_func, depth, false, S.OK);
             return R.ok(P.CONCAT, index, idx - index, children);
+        };
+    }
+
+    // List: matches a list of elements separated by a delimiter, example "a, b, c" 
+    export function LIST(element_parser, delimiter_parser) {
+        var _func = 'LIST';
+        var _parser = CONCAT(element_parser, REPEAT(CONCAT(delimiter_parser, element_parser), 0));
+
+        return function(buffer: string, index: number, depth: number = 0): R {
+            _trace(_func, depth, true);
+            
+            var r: R;
+            var _r: R = _parser(buffer, index, depth);
+
+            if (S.OK == _r.status) {
+                var _children: R[] = [];
+
+                _children.push(_r.children[0]);
+
+                for (var i = 0; i < _r.children[1].children.length; ++i) {
+                    _children.push(_r.children[1].children[i].children[1]);
+                }
+
+                r = R.ok(P.LIST, index, _r.length, _children);
+            }
+            else {
+                r = R.error(P.LIST, index, null, 'Failed to match LIST');
+            }
+
+            S.ERROR == r.status && _update_last_error(r);
+            _trace(_func, depth, false, r.status);
+            return r;
         };
     }
 
