@@ -25,6 +25,7 @@ module paka {
         SEQ : 'SEQ', // sequence 
         CONCAT : 'CONCAT', // concatenate (ignore white spaces)
         LIST : 'LIST', // list 
+        OPT_LIST : 'OPT_LIST', // list 
         REPEAT : 'REPEAT', // repeat
         OPT : 'OPT', // optional
         RULE : 'RULE', // rule
@@ -429,6 +430,31 @@ module paka {
             }
             else {
                 r = R.error(P.LIST, index, null, 'Failed to match LIST');
+            }
+
+            S.ERROR == r.status && _update_last_error(r);
+            _trace(_func, depth, false, r.status);
+            return r;
+        };
+    }
+
+    // Optional List: matches a list of n elements (n >= 0), example "a, b, c"
+    export function OPT_LIST(element_parser, delimiter_parser, save_delimiter: boolean = false) {
+        var _func = 'OPT_LIST';
+        var _parser = OPT(LIST(element_parser, delimiter_parser, save_delimiter));
+
+        return function(buffer: string, index: number, depth: number = 0): R {
+            _trace(_func, depth, true);
+            
+            var r: R;
+            var _r: R = _parser(buffer, index, depth);
+
+            if (S.OK == _r.status) {
+                var _children: R[] = (null != _r.children && _r.children.length > 0 ? _r.children[0].children : null);
+                r = R.ok(P.OPT_LIST, index, _r.length, _children);
+            }
+            else {
+                r = R.error(P.OPT_LIST, index, null, 'Failed to match OPT_LIST');
             }
 
             S.ERROR == r.status && _update_last_error(r);

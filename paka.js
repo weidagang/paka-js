@@ -24,6 +24,7 @@
         SEQ: 'SEQ',
         CONCAT: 'CONCAT',
         LIST: 'LIST',
+        OPT_LIST: 'OPT_LIST',
         REPEAT: 'REPEAT',
         OPT: 'OPT',
         RULE: 'RULE',
@@ -440,6 +441,33 @@
         };
     }
     paka.LIST = LIST;
+
+    // Optional List: matches a list of n elements (n >= 0), example "a, b, c"
+    function OPT_LIST(element_parser, delimiter_parser, save_delimiter) {
+        if (typeof save_delimiter === "undefined") { save_delimiter = false; }
+        var _func = 'OPT_LIST';
+        var _parser = OPT(LIST(element_parser, delimiter_parser, save_delimiter));
+
+        return function (buffer, index, depth) {
+            if (typeof depth === "undefined") { depth = 0; }
+            _trace(_func, depth, true);
+
+            var r;
+            var _r = _parser(buffer, index, depth);
+
+            if (paka.S.OK == _r.status) {
+                var _children = (null != _r.children && _r.children.length > 0 ? _r.children[0].children : null);
+                r = R.ok(paka.P.OPT_LIST, index, _r.length, _children);
+            } else {
+                r = R.error(paka.P.OPT_LIST, index, null, 'Failed to match OPT_LIST');
+            }
+
+            paka.S.ERROR == r.status && _update_last_error(r);
+            _trace(_func, depth, false, r.status);
+            return r;
+        };
+    }
+    paka.OPT_LIST = OPT_LIST;
 
     function OR() {
         var parsers = [];

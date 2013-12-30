@@ -609,6 +609,71 @@ function test_LIST() {
     console.log('Result for ' + case_name + ', passed: ' + case_i);
 }
 
+function test_OPT_LIST() {
+    var case_name = arguments.callee.name;
+    var case_i = 0;
+    console.log('Begin ' + case_name);
+
+    var OPT_LIST = paka.OPT_LIST;
+    var INT = paka.INT;
+    var $ = paka.$;
+
+    var S = paka.S;
+    var R = paka.R;
+    var P = paka.P;
+    
+    var r = OPT_LIST(INT(), ',')('123, 234, 456', 0);
+    assert(S.OK == r.status);
+    assert(P.OPT_LIST == r.operator);
+    assert(r.index == 0 && r.length == 13);
+    assert(r.children.length == 3);
+    assert(r.children[0].operator == P.INT);
+    assert(r.children[1].operator == P.INT);
+    assert(r.children[2].operator == P.INT);
+    ++case_i;
+
+    var r = OPT_LIST(INT(), ',', true)('123, 234, 456', 0);
+    assert(S.OK == r.status);
+    assert(P.OPT_LIST == r.operator);
+    assert(r.index == 0 && r.length == 13);
+    assert(r.children.length == 5);
+    assert(r.children[0].operator == P.INT);
+    assert(r.children[1].operator == P.SYM);
+    assert(r.children[2].operator == P.INT);
+    assert(r.children[3].operator == P.SYM);
+    assert(r.children[4].operator == P.INT);
+    ++case_i;
+
+    var r = OPT_LIST(INT(), ',')('123, 234, 456,', 0);
+    assert(S.OK == r.status);
+    assert(P.OPT_LIST == r.operator);
+    assert(r.index == 0 && r.length == 13);
+    assert(r.children.length == 3);
+    assert(r.children[0].operator == P.INT);
+    assert(r.children[1].operator == P.INT);
+    assert(r.children[2].operator == P.INT);
+    ++case_i;
+
+    var r = OPT_LIST(INT(), ',')(' 123, 234, 456,', 0);
+    assert(S.OK == r.status);
+    assert(P.OPT_LIST == r.operator);
+    assert(r.index == 0 && r.length == 14);
+    assert(r.children.length == 3);
+    assert(r.children[0].operator == P.INT);
+    assert(r.children[1].operator == P.INT);
+    assert(r.children[2].operator == P.INT);
+    ++case_i;
+
+    var r = OPT_LIST(INT(), ',')(' abc, 234, 456,', 0);
+    assert(S.OK == r.status);
+    assert(P.OPT_LIST == r.operator);
+    assert(r.index == 0 && r.length == 0);
+    assert(r.children == null);
+    ++case_i;
+
+    console.log('Result for ' + case_name + ', passed: ' + case_i);
+}
+
 function test_$() {
     var case_name = arguments.callee.name;
     var case_i = 0;
@@ -660,4 +725,5 @@ test_OR();
 test_REPEAT();
 test_OPT();
 test_LIST();
+test_OPT_LIST();
 test_$();

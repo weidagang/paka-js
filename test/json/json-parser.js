@@ -24,14 +24,14 @@ function parse(src) {
     var REPEAT = paka.REPEAT;
     var OPT = paka.OPT;
     var DQ_STR = paka.DQ_STR;
-    var LIST = paka.LIST;
+    var OPT_LIST = paka.OPT_LIST;
     var $ = paka.$;
     
     var grammar = {
         'JSON' : CONCAT($('Value'), EOF),
         'Value' : OR($('Num'), $('Null'), $('Bool'), $('String'), $('Object')),
-        'Object' : CONCAT('{', OPT($('KeyValueList')), '}'),
-        'KeyValueList' : LIST($('KeyValuePair'), ','),
+        'Object' : CONCAT('{', $('KeyValueList'), '}'),
+        'KeyValueList' : OPT_LIST($('KeyValuePair'), ','),
         'KeyValuePair' : CONCAT($('Key'), ':', $('Value')),
         'Key' : $('String'),
         'Num' : INT(),
@@ -50,13 +50,13 @@ function parse(src) {
         'KeyValuePair' : function(r) { r.extra = { key : r.children[0].extra, value : r.children[2].extra }; },
         'KeyValueList' : function(r) { 
             r.extra = {};
-            for (var i = 0; i < r.children.length; ++i) {
+            for (var i = 0; null != r.children && i < r.children.length; ++i) {
                 r.extra[r.children[i].extra.key] = r.children[i].extra.value;
             }
         },
         'Object' : function(r) { 
-            if (null != r.children[1].children && null != r.children[1].children[0])  {
-                r.extra = r.children[1].children[0].extra; 
+            if (null != r.children[1])  {
+                r.extra = r.children[1].extra; 
             }
             else {
                 r.extra = {};
