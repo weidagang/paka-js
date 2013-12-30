@@ -12,17 +12,34 @@ function print_result(ast) {
     console.log("--------------------\n");
 }
 
-var json = '{}'
-var ast = parser.parse(json);
-
-var json = '{ "k1" : "v1", "k2" : 1234, "k3" : false, "k4" : null, "k5" : { "k 51" : "v 51", "k 52" : 52} }'
+var json = '"hello world"';
 var ast = parser.parse(json);
 print_result(ast);
 
-var json = '{ "k 1" : "v 1", "k\\"2" : "v\\"2" }'
+var json = '123';
 var ast = parser.parse(json);
 print_result(ast);
 
-var json = '{ k1 : "v1", "k2" : 1234, "k3" : false, "k4" : null }'
+var json = 'true';
+var ast = parser.parse(json);
+print_result(ast);
+
+var json = 'null';
+var ast = parser.parse(json);
+print_result(ast);
+
+var json = '{}';
+var ast = parser.parse(json);
+print_result(ast);
+
+var json = '{ "k1" : "v1", "k2" : 1234, "k3" : false, "k4" : null, "k5" : { "k 51" : "v 51", "k 52" : 52} }';
+var ast = parser.parse(json);
+print_result(ast);
+
+var json = '{ "k 1" : "v 1", "k\\"2" : "v\\"2" }';
+var ast = parser.parse(json);
+print_result(ast);
+
+var json = '{ k1 : "v1", "k2" : 1234, "k3" : false, "k4" : null }';
 var ast = parser.parse(json);
 print_result(ast);

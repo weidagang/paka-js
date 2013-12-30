@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+// JSON grammar reference: http://www.json.org/fatfree.html
+
 var paka = require('../../paka.js');
 var path = require('path');
 var util = require('util');
@@ -26,12 +28,12 @@ function parse(src) {
     var $ = paka.$;
     
     var grammar = {
-        'JSON' : CONCAT($('Object'), EOF),
+        'JSON' : CONCAT($('Value'), EOF),
+        'Value' : OR($('Num'), $('Null'), $('Bool'), $('String'), $('Object')),
         'Object' : CONCAT('{', OPT($('KeyValueList')), '}'),
         'KeyValueList' : LIST($('KeyValuePair'), ','),
         'KeyValuePair' : CONCAT($('Key'), ':', $('Value')),
         'Key' : $('String'),
-        'Value' : OR($('Num'), $('Null'), $('Bool'), $('String'), $('Object')),
         'Num' : INT(),
         'Null' : 'null',
         'Bool' : OR('false', 'true'),
