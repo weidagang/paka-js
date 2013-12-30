@@ -25,6 +25,7 @@
         CONCAT: 'CONCAT',
         LIST: 'LIST',
         OPT_LIST: 'OPT_LIST',
+        ENCLOSED_LIST: 'ENCLOSED_LIST',
         REPEAT: 'REPEAT',
         OPT: 'OPT',
         RULE: 'RULE',
@@ -468,6 +469,33 @@
         };
     }
     paka.OPT_LIST = OPT_LIST;
+
+    // Enclosed List: matches a enclosed list of n elements (n >= 0), example "[ a, b, c ]"
+    function ENCLOSED_LIST(left_bracket, element_parser, delimiter_parser, right_bracket, save_delimiter) {
+        if (typeof save_delimiter === "undefined") { save_delimiter = false; }
+        var _func = 'ENCLOSED_LIST';
+        var _parser = CONCAT(left_bracket, OPT_LIST(element_parser, delimiter_parser, save_delimiter), right_bracket);
+
+        return function (buffer, index, depth) {
+            if (typeof depth === "undefined") { depth = 0; }
+            _trace(_func, depth, true);
+
+            var r;
+            var _r = _parser(buffer, index, depth);
+
+            if (paka.S.OK == _r.status) {
+                var _children = _r.children[1].children;
+                r = R.ok(paka.P.ENCLOSED_LIST, index, _r.length, _children);
+            } else {
+                r = R.error(paka.P.ENCLOSED_LIST, index, null, 'Failed to match ENCLOSED_LIST');
+            }
+
+            paka.S.ERROR == r.status && _update_last_error(r);
+            _trace(_func, depth, false, r.status);
+            return r;
+        };
+    }
+    paka.ENCLOSED_LIST = ENCLOSED_LIST;
 
     function OR() {
         var parsers = [];

@@ -26,6 +26,7 @@ module paka {
         CONCAT : 'CONCAT', // concatenate (ignore white spaces)
         LIST : 'LIST', // list 
         OPT_LIST : 'OPT_LIST', // list 
+        ENCLOSED_LIST : 'ENCLOSED_LIST', // enclosed list
         REPEAT : 'REPEAT', // repeat
         OPT : 'OPT', // optional
         RULE : 'RULE', // rule
@@ -455,6 +456,31 @@ module paka {
             }
             else {
                 r = R.error(P.OPT_LIST, index, null, 'Failed to match OPT_LIST');
+            }
+
+            S.ERROR == r.status && _update_last_error(r);
+            _trace(_func, depth, false, r.status);
+            return r;
+        };
+    }
+
+    // Enclosed List: matches a enclosed list of n elements (n >= 0), example "[ a, b, c ]"
+    export function ENCLOSED_LIST(left_bracket, element_parser, delimiter_parser, right_bracket, save_delimiter: boolean = false) {
+        var _func = 'ENCLOSED_LIST';
+        var _parser = CONCAT(left_bracket, OPT_LIST(element_parser, delimiter_parser, save_delimiter), right_bracket);
+
+        return function(buffer: string, index: number, depth: number = 0): R {
+            _trace(_func, depth, true);
+            
+            var r: R;
+            var _r: R = _parser(buffer, index, depth);
+
+            if (S.OK == _r.status) {
+                var _children: R[] = _r.children[1].children;
+                r = R.ok(P.ENCLOSED_LIST, index, _r.length, _children);
+            }
+            else {
+                r = R.error(P.ENCLOSED_LIST, index, null, 'Failed to match ENCLOSED_LIST');
             }
 
             S.ERROR == r.status && _update_last_error(r);
