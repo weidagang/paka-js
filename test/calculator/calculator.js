@@ -15,18 +15,15 @@ function calculate(src) {
     var EOF = paka.EOF;
     var CONCAT = paka.CONCAT;
     var OR = paka.OR;
-    var REPEAT = paka.REPEAT;
-    var OPT = paka.OPT;
+    var LIST = paka.LIST;
     var $ = paka.$;
 
     var grammar = {
         'Arithmetic' : CONCAT($('Expr'), EOF),
-        'Expr' : CONCAT($('Term'), $('Terms')),
-        'Term' : CONCAT($('Factor'), $('Factors') ),
-        'Terms' : REPEAT(CONCAT($('TermOp'), $('Term')), 0),
+        'Expr' : LIST($('Term'), $('TermOp'), true),
+        'Term' : LIST($('Factor'), $('FactorOp'), true),
         'TermOp' : OR('+', '-'),
         'Factor' : OR($('P-Expr'), $('Num')),
-        'Factors' : REPEAT(CONCAT($('FactorOp'), $('Factor')), 0),
         'FactorOp' : OR('*', '/'),
         'P-Expr' : CONCAT('(', $('Expr'), ')'),
         'Num' : INT()
@@ -35,43 +32,31 @@ function calculate(src) {
     var action = {
         'Num' : function(r) { r.extra = parseInt(r.text()); },
         'Factor' : function(r) { r.extra = r.children[0].extra; },
-        'Factors' : function(r) { 
-            r.extra = 1;
-            for (var i = 0; i < r.children.length; ++i) {
-                var _seq = r.children[i];
-                var factorOp = _seq.children[0];
-                var factor = _seq.children[1];
-                if ('*' == factorOp.text()) {
+        'Term' : function(r) { 
+            r.extra = r.children[0].extra;
+            for (var i = 1; i < r.children.length; i += 2) {
+                var factor_op = r.children[i];        
+                var factor = r.children[i+1];
+                if ('*' == factor_op.text()) {
                     r.extra *= factor.extra;
                 }
-                else if ('/' == factorOp.text()) {
+                else if ('/' == factor_op.text()) {
                     r.extra /= factor.extra;
                 }
             }
         },
-        'Term' : function(r) { 
-            var factor = r.children[0];
-            var factors = r.children[1];
-            r.extra = factor.extra * (null != factors ? factors.extra : 1);
-        },
-        'Terms' : function(r) {
-            r.extra = 0;
-            for (var i = 0; null != r.children && i < r.children.length; ++i) {
-                var _seq = r.children[i];
-                var _termOp = _seq.children[0];
-                var _term = _seq.children[1];
-                if ('+' == _termOp.text()) {
-                    r.extra += _term.extra;
+        'Expr' : function(r) {
+            r.extra = r.children[0].extra;
+            for (var i = 1; i < r.children.length; i += 2) {
+                var factor_op = r.children[i];        
+                var factor = r.children[i+1];
+                if ('+' == factor_op.text()) {
+                    r.extra += factor.extra;
                 }
-                else if ('-' == _termOp.text()) {
-                    r.extra -= _term.extra;
+                else if ('-' == factor_op.text()) {
+                    r.extra -= factor.extra;
                 }
             }
-        },
-        'Expr' : function(r) {
-            var term = r.children[0];
-            var terms = r.children[1];
-            r.extra = term.extra + (terms != null ? terms.extra : 0);
         },
         'P-Expr' : function(r) { r.extra = r.children[1].extra; },
         'Arithmetic' : function(r) { r.extra = r.children[0].extra; }
