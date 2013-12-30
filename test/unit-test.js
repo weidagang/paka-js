@@ -305,6 +305,9 @@ function test_DQ_STR() {
     var r = DQ_STR()('"\\"', 0);
     assert(S.ERROR == r.status && P.DQ_STR == r.operator && r.length == 0, case_name + "." + (++case_i));
 
+    var r = DQ_STR()('"\\x"', 0);
+    assert(S.ERROR == r.status && P.DQ_STR == r.operator && r.length == 0, case_name + "." + (++case_i));
+
     console.log('Result for ' + case_name + ', passed: ' + case_i);
 }
 
@@ -337,6 +340,9 @@ function test_SQ_STR() {
     assert(S.ERROR == r.status && P.SQ_STR == r.operator, case_name + "." + (++case_i));
 
     var r = SQ_STR()("'\\'", 0);
+    assert(S.ERROR == r.status && P.SQ_STR == r.operator && r.length == 0, case_name + "." + (++case_i));
+
+    var r = SQ_STR()("'\\x'", 0);
     assert(S.ERROR == r.status && P.SQ_STR == r.operator && r.length == 0, case_name + "." + (++case_i));
 
     console.log('Result for ' + case_name + ', passed: ' + case_i);
