@@ -5,7 +5,7 @@ Paka.js is a higher-order function based parser combinator. It's designed for cr
 
 ### Example ###
 
- ** Caculator **
+#### Caculator ####
 
 The following code implements a working caculator in less than 100 lines of code. The hightlight is that the language grammar is written in the embedded DSL, it's clean and easy to maintain.
 
@@ -76,7 +76,7 @@ function calculate(src) {
 }
 ```
 
- ** JSON Parser **
+#### JSON Parser ####
 
 The following code implements a JSON parser which creates a JSON object from its string representation. 
 
