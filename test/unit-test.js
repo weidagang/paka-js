@@ -491,6 +491,17 @@ function test_LIST() {
     assert(r.children[1].operator == P.INT);
     assert(r.children[2].operator == P.INT);
 
+    var r = LIST(INT(), ',', true)('123, 234, 456', 0);
+    assert(S.OK == r.status);
+    assert(P.LIST == r.operator);
+    assert(r.index == 0 && r.length == 13);
+    assert(r.children.length == 5);
+    assert(r.children[0].operator == P.INT);
+    assert(r.children[1].operator == P.SYM);
+    assert(r.children[2].operator == P.INT);
+    assert(r.children[3].operator == P.SYM);
+    assert(r.children[4].operator == P.INT);
+
     var r = LIST(INT(), ',')('123, 234, 456,', 0);
     assert(S.OK == r.status);
     assert(P.LIST == r.operator);

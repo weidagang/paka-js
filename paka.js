@@ -376,7 +376,8 @@
     paka.CONCAT = CONCAT;
 
     // List: matches a list of elements separated by a delimiter, example "a, b, c"
-    function LIST(element_parser, delimiter_parser) {
+    function LIST(element_parser, delimiter_parser, save_delimiter) {
+        if (typeof save_delimiter === "undefined") { save_delimiter = false; }
         var _func = 'LIST';
         var _parser = CONCAT(element_parser, REPEAT(CONCAT(delimiter_parser, element_parser), 0));
 
@@ -393,6 +394,9 @@
                 _children.push(_r.children[0]);
 
                 for (var i = 0; i < _r.children[1].children.length; ++i) {
+                    if (save_delimiter) {
+                        _children.push(_r.children[1].children[i].children[0]);
+                    }
                     _children.push(_r.children[1].children[i].children[1]);
                 }
 
