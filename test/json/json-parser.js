@@ -29,14 +29,15 @@ function parse(src) {
     
     var grammar = {
         'JSON' : CONCAT($('Value'), EOF),
-        'Value' : OR($('Num'), $('Null'), $('Bool'), $('String'), $('Object')),
+        'Value' : OR($('Num'), $('Null'), $('Bool'), $('String'), $('Object'), $('Array')),
         'Object' : ENCLOSED_LIST('{', $('KeyValuePair'), ',', '}'),
         'KeyValuePair' : CONCAT($('Key'), ':', $('Value')),
         'Key' : $('String'),
         'Num' : INT(),
         'Null' : 'null',
         'Bool' : OR('false', 'true'),
-        'String' : DQ_STR()
+        'String' : DQ_STR(),
+        'Array' : ENCLOSED_LIST('[', $('Value'), ',', ']')
     };
 
     var actions = {
@@ -51,6 +52,12 @@ function parse(src) {
             r.extra = {};
             for (var i = 0; null != r.children && i < r.children.length; ++i) {
                 r.extra[r.children[i].extra.key] = r.children[i].extra.value;
+            }
+        },
+        'Array' : function(r) {
+            r.extra = [];
+            for (var i = 0; null != r.children && i < r.children.length; ++i) {
+                r.extra.push(r.children[i].extra);
             }
         },
         'JSON' : function(r) { r.extra = r.children[0].extra; }

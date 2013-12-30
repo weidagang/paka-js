@@ -40,17 +40,22 @@ print_input(json);
 var ast = parser.parse(json);
 print_output(ast);
 
-var json = '{ "k1" : "v1", "k2" : 1234, "k3" : false, "k4" : null, "k5" : { "k 51" : "v 51", "k 52" : 52} }';
+var json = '[]';
+print_input(json);
+var ast = parser.parse(json);
+print_output(ast);
+
+var json = '[1, "hello", null, { "k1" : "v1" }, [1, 2, 3] ]';
+print_input(json);
+var ast = parser.parse(json);
+print_output(ast);
+
+var json = '{ "k1" : "v1", "k2" : 1234, "k3" : false, "k4" : null, "k5" : { "k 51" : "v 51", "k 52" : 52}, "k6" : [ "v6" ] }';
 print_input(json);
 var ast = parser.parse(json);
 print_output(ast);
 
 var json = '{ "k 1" : "v 1", "k\\"2" : "v\\"2" }';
-print_input(json);
-var ast = parser.parse(json);
-print_output(ast);
-
-var json = '{ k1 : "v1", "k2" : 1234, "k3" : false, "k4" : null }';
 print_input(json);
 var ast = parser.parse(json);
 print_output(ast);
