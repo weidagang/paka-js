@@ -8,8 +8,8 @@ clean:
 paka.js: paka.ts
 	tsc --module commonjs paka.ts 
 
-.PHONY: paka-unit-test 
-paka-unit-test: paka.js
+.PHONY: unit-test 
+unit-test: paka.js
 	node test/unit-test.js 
 
 .PHONY: test-calculator
@@ -21,4 +21,7 @@ test-json-parser: paka.js
 	node test/json/test-json-parser.js
 
 .PHONY: test
-test: paka-unit-test
+test: unit-test
+
+.PHONY: test-all
+test-all: unit-test test-calculator test-json-parser

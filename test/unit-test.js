@@ -273,28 +273,28 @@ function test_SQ_STR() {
     console.log('Case ' + case_name + ' passed');
 }
 
-function test_CHAR() {
+function test_IN() {
     var case_name = arguments.callee.name;
     var case_i = 0;
     console.log('Begin case ' + case_name);
 
-    var CHAR = paka.CHAR;
+    var IN = paka.IN;
     var S = paka.S;
     var R = paka.R;
     
-    var r = CHAR("+-*/")("+", 0);
+    var r = IN("+-*/")("+", 0);
     assert(S.OK == r.status && r.length == 1, case_name + "." + (++case_i));
 
-    var r = CHAR("+-*/")("+-*/", 0);
+    var r = IN("+-*/")("+-*/", 0);
     assert(S.OK == r.status && r.length == 1, case_name + "." + (++case_i));
 
-    var r = CHAR("*/+-")("-foo", 0);
+    var r = IN("*/+-")("-foo", 0);
     assert(S.OK == r.status && r.length == 1, case_name + "." + (++case_i));
 
-    var r = CHAR("*/+-")("?foo", 0);
+    var r = IN("*/+-")("?foo", 0);
     assert(S.ERROR == r.status, case_name + "." + (++case_i));
 
-    var r = CHAR("*/+-")("foo+bar", 0);
+    var r = IN("*/+-")("foo+bar", 0);
     assert(S.ERROR == r.status, case_name + "." + (++case_i));
 
     console.log('Case ' + case_name + ' passed');
@@ -573,7 +573,7 @@ test_UINT();
 test_SYM();
 test_DQ_STR();
 test_SQ_STR();
-test_CHAR();
+test_IN();
 test_SEQ();
 test_CONCAT();
 test_OR();

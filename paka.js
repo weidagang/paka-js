@@ -13,8 +13,8 @@
         INT: 'INT',
         UINT: 'UINT',
         SYM: 'SYM',
-        CHAR: 'CHAR',
-        NCHAR: 'NCHAR',
+        IN: 'IN',
+        NOT_IN: 'NOT_IN',
         Q_STR: 'Q_STR',
         DQ_STR: 'DQ_STR',
         SQ_STR: 'SQ_STR',
@@ -228,7 +228,7 @@
         if ('string' != typeof (quote) || 1 != quote.length) {
             throw 'Invalid quote for Q_STR';
         }
-        var _parser = SEQ(quote, REPEAT(OR('\\\\', '\\' + quote, NCHAR(quote))), quote);
+        var _parser = SEQ(quote, REPEAT(OR('\\\\', '\\' + quote, NOT_IN(quote))), quote);
         return _make_alias('Q_STR(' + quote + ')', paka.P.Q_STR, _parser);
     }
     paka.Q_STR = Q_STR;
@@ -245,45 +245,45 @@
     }
     paka.SQ_STR = SQ_STR;
 
-    // Char: matches any character in the given string
-    function CHAR(chars) {
-        var _func = 'CHAR("' + chars + '")';
+    // IN: matches any character in the given string
+    function IN(chars) {
+        var _func = 'IN("' + chars + '")';
         return function (buffer, index, depth) {
             if (typeof depth === "undefined") { depth = 0; }
             _trace(_func, depth, true);
             var r;
             if (index < buffer.length && chars.indexOf(buffer[index]) >= 0) {
                 _trace(_func, depth, false, paka.S.OK);
-                return R.ok(paka.P.CHAR, index, 1, null);
+                return R.ok(paka.P.IN, index, 1, null);
             } else {
-                r = R.error(paka.P.CHAR, index, null, 'Expects a char in "' + chars + '"');
+                r = R.error(paka.P.IN, index, null, 'Expects a char in "' + chars + '"');
                 _update_last_error(r);
                 _trace(_func, depth, false, paka.S.ERROR);
                 return r;
             }
         };
     }
-    paka.CHAR = CHAR;
+    paka.IN = IN;
 
-    // Not Char: matches any character not in the given string
-    function NCHAR(chars) {
-        var _func = 'NCHAR("' + chars + '")';
+    // Not In: matches any character not in the given string
+    function NOT_IN(chars) {
+        var _func = 'NOT_IN("' + chars + '")';
         return function (buffer, index, depth) {
             if (typeof depth === "undefined") { depth = 0; }
             _trace(_func, depth, true);
             var r;
             if (index < buffer.length && chars.indexOf(buffer[index]) < 0) {
                 _trace(_func, depth, false, paka.S.OK);
-                return R.ok(paka.P.NCHAR, index, 1, null);
+                return R.ok(paka.P.NOT_IN, index, 1, null);
             } else {
-                r = R.error(paka.P.NCHAR, index, null, 'Expects a char not in "' + chars + '"');
+                r = R.error(paka.P.NOT_IN, index, null, 'Expects a char not in "' + chars + '"');
                 _update_last_error(r);
                 _trace(_func, depth, false, paka.S.ERROR);
                 return r;
             }
         };
     }
-    paka.NCHAR = NCHAR;
+    paka.NOT_IN = NOT_IN;
 
     // Sequence: matches all the sub-parsers in sequence
     function SEQ() {

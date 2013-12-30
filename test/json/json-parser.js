@@ -25,7 +25,6 @@ function parse(src) {
     var LIST = paka.LIST;
     var $ = paka.$;
     
-
     var grammar = {
         'JSON' : CONCAT($('Object'), EOF),
         'Object' : CONCAT('{', OPT($('KeyValueList')), '}'),
@@ -39,7 +38,7 @@ function parse(src) {
         'String' : DQ_STR()
     };
 
-    var action = {
+    var actions = {
         'Num' : function(r) { r.extra = parseInt(r.text()); },
         'Null' : function(r) { r.extra = null },
         'Bool' : function(r) { r.extra = ('true' == r.text()); },
@@ -64,7 +63,7 @@ function parse(src) {
         'JSON' : function(r) { r.extra = r.children[0].extra; }
     }
 
-    var parser = paka.define(grammar, action);
+    var parser = paka.define(grammar, actions);
     var ast = parser.parse('JSON', src);
 
     //console.log(util.inspect(ast, false, 10));

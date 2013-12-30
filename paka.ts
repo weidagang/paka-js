@@ -14,8 +14,8 @@ module paka {
         INT : 'INT', // signed integer
         UINT : 'UINT', // unsigned integer
         SYM : 'SYM', // symbol
-        CHAR : 'CHAR', // char in set
-        NCHAR : 'NCHAR', // char not in set
+        IN : 'IN', // char in set
+        NOT_IN : 'NOT_IN', // char not in set
         Q_STR : 'Q_STR', // quoted string
         DQ_STR : 'DQ_STR', // double quoted string
         SQ_STR : 'SQ_STR', // single quoted string
@@ -228,7 +228,7 @@ module paka {
         if ('string' != typeof(quote) || 1 != quote.length) {
             throw 'Invalid quote for Q_STR';
         }
-        var _parser = SEQ(quote, REPEAT(OR('\\\\', '\\' + quote, NCHAR(quote))), quote);
+        var _parser = SEQ(quote, REPEAT(OR('\\\\', '\\' + quote, NOT_IN(quote))), quote);
         return _make_alias('Q_STR(' + quote + ')', P.Q_STR, _parser);
     }
 
@@ -242,18 +242,18 @@ module paka {
         return _make_alias('SQ_STR()' , P.SQ_STR, Q_STR("'"));
     }
 
-    // Char: matches any character in the given string
-    export function CHAR(chars: string) {
-        var _func = 'CHAR("' + chars + '")';
+    // IN: matches any character in the given string
+    export function IN(chars: string) {
+        var _func = 'IN("' + chars + '")';
         return function(buffer: string, index: number, depth: number = 0): R {
             _trace(_func, depth, true);
             var r: R;
             if (index < buffer.length && chars.indexOf(buffer[index]) >= 0) {
                 _trace(_func, depth, false, S.OK);
-                return R.ok(P.CHAR, index, 1, null);
+                return R.ok(P.IN, index, 1, null);
             }
             else {
-                r = R.error(P.CHAR, index, null, 'Expects a char in "' + chars + '"');
+                r = R.error(P.IN, index, null, 'Expects a char in "' + chars + '"');
                 _update_last_error(r);
                 _trace(_func, depth, false, S.ERROR);
                 return r; 
@@ -261,18 +261,18 @@ module paka {
         };
     }
 
-    // Not Char: matches any character not in the given string
-    export function NCHAR(chars: string) {
-        var _func = 'NCHAR("' + chars + '")';
+    // Not In: matches any character not in the given string
+    export function NOT_IN(chars: string) {
+        var _func = 'NOT_IN("' + chars + '")';
         return function(buffer: string, index: number, depth: number = 0): R {
             _trace(_func, depth, true);
             var r: R;
             if (index < buffer.length && chars.indexOf(buffer[index]) < 0) {
                 _trace(_func, depth, false, S.OK);
-                return R.ok(P.NCHAR, index, 1, null);
+                return R.ok(P.NOT_IN, index, 1, null);
             }
             else {
-                r = R.error(P.NCHAR, index, null, 'Expects a char not in "' + chars + '"');
+                r = R.error(P.NOT_IN, index, null, 'Expects a char not in "' + chars + '"');
                 _update_last_error(r);
                 _trace(_func, depth, false, S.ERROR);
                 return r; 
