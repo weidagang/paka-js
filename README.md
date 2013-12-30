@@ -3,9 +3,9 @@ paka.js
 
 Paka.js is a higher-order function based parser combinator. It's designed for creating language parsers in JavaScript. Unlike external parser generators such as ANTLR, there's no static code generation involved. When writing language parsers in JavaScript, you can define the language grammar and semantics actions with the embedded DSL of paka.js, it is much light-weighted than external parser generators.
 
-### Example ###
+### Examples ###
 
-#### Caculator ####
+#### 1. Caculator ####
 
 The following code implements a working caculator in less than 100 lines of code. The hightlight is that the language grammar is written in the embedded DSL, it's clean and easy to maintain.
 
@@ -76,7 +76,7 @@ function calculate(src) {
 }
 ```
 
-#### JSON Parser ####
+#### 2. JSON Parser ####
 
 The following code implements a JSON parser which creates a JSON object from its string representation. 
 
