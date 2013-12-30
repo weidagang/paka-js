@@ -10,6 +10,7 @@ module paka {
         WS : 'WS', // white space
         RANGE : 'RANGE', // range
         ALPH : 'ALPH', //alphabet
+        UNICODE : 'UNICODE', //unicode
         DIGIT : 'DIGIT', // digit
         INT : 'INT', // signed integer
         UINT : 'UINT', // unsigned integer
@@ -201,6 +202,26 @@ module paka {
                 _trace(_func, depth, false, S.ERROR);
                 return r;
             }
+        };
+    }
+
+    // Unicode: matches a unicode character, exmaple: 'L'
+    export function UNICODE() {
+        var _func = 'UNICODE';
+        return function(buffer: string, index: number, depth: number = 0) {
+            _trace(_func, depth, true);
+            var r: R;
+
+            if (index < buffer.length) {
+                r = R.ok(P.UNICODE, index, 1, null);    
+            }
+            else {
+                r = R.error(P.UNICODE, index, null, 'Expects a unicode character');
+            }
+
+            S.ERROR == r.status && _update_last_error(r);
+            _trace(_func, depth, false, r.status);
+            return r;
         };
     }
 

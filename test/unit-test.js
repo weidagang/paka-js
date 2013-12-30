@@ -88,6 +88,37 @@ function test_ALPH() {
     console.log('Case ' + case_name + ' passed');
 }
 
+function test_UNICODE() {
+    var case_name = arguments.callee.name;
+    var case_i = 0;
+    console.log('Begin case ' + case_name);
+
+    var UNICODE = paka.UNICODE;
+    var S = paka.S;
+    var R = paka.R;
+    var P = paka.P;
+    
+    var r = UNICODE()("f", 0);
+    assert(S.OK == r.status && P.UNICODE == r.operator && r.length == 1, case_name + "." + (++case_i));
+
+    var r = UNICODE()("foo bar", 0);
+    assert(S.OK == r.status && P.UNICODE == r.operator && r.index == 0 && r.length == 1, case_name + "." + (++case_i));
+
+    var r = UNICODE()(" foo bar", 1);
+    assert(S.OK == r.status && P.UNICODE == r.operator && r.index == 1 && r.length == 1, case_name + "." + (++case_i));
+
+    var r = UNICODE()("1 foo bar", 0);
+    assert(S.OK == r.status && P.UNICODE == r.operator && r.index == 0 && r.length == 1, case_name + "." + (++case_i));
+
+    var r = UNICODE()("你好", 0);
+    assert(S.OK == r.status && P.UNICODE == r.operator && r.index == 0 && r.length == 1, case_name + "." + (++case_i));
+
+    var r = UNICODE()("foo bar", 7);
+    assert(S.ERROR == r.status && P.UNICODE == r.operator && r.index == 7 && r.length == 0, case_name + "." + (++case_i));
+
+    console.log('Case ' + case_name + ' passed');
+}
+
 function test_DIGIT() {
     var case_name = arguments.callee.name;
     var case_i = 0;
@@ -567,6 +598,7 @@ function test_$() {
 
 test_WS();
 test_ALPH();
+test_UNICODE();
 test_DIGIT();
 test_INT();
 test_UINT();

@@ -9,6 +9,7 @@
         WS: 'WS',
         RANGE: 'RANGE',
         ALPH: 'ALPH',
+        UNICODE: 'UNICODE',
         DIGIT: 'DIGIT',
         INT: 'INT',
         UINT: 'UINT',
@@ -202,6 +203,27 @@
         };
     }
     paka.ALPH = ALPH;
+
+    // Unicode: matches a unicode character, exmaple: 'L'
+    function UNICODE() {
+        var _func = 'UNICODE';
+        return function (buffer, index, depth) {
+            if (typeof depth === "undefined") { depth = 0; }
+            _trace(_func, depth, true);
+            var r;
+
+            if (index < buffer.length) {
+                r = R.ok(paka.P.UNICODE, index, 1, null);
+            } else {
+                r = R.error(paka.P.UNICODE, index, null, 'Expects a unicode character');
+            }
+
+            paka.S.ERROR == r.status && _update_last_error(r);
+            _trace(_func, depth, false, r.status);
+            return r;
+        };
+    }
+    paka.UNICODE = UNICODE;
 
     // Symbol: matches a string like "function"
     function SYM(symbol) {
