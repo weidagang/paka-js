@@ -6,7 +6,7 @@ var assert = require('assert');
 function test_WS() {
     var case_name = arguments.callee.name;
     var case_i = 0;
-    console.log('Begin case ' + case_name);
+    console.log('Begin ' + case_name);
 
     var WS = paka.WS;
     var S = paka.S;
@@ -57,13 +57,13 @@ function test_WS() {
     var r = WS(3, 3)("\t\t\t\t", 0);
     assert(S.OK == r.status && r.length == 3, case_name + "." + (++case_i));
 
-    console.log('Case ' + case_name + ' passed');
+    console.log('Result for ' + case_name + ', passed: ' + case_i);
 }
 
 function test_ALPH() {
     var case_name = arguments.callee.name;
     var case_i = 0;
-    console.log('Begin case ' + case_name);
+    console.log('Begin ' + case_name);
 
     var ALPH = paka.ALPH;
     var S = paka.S;
@@ -85,13 +85,13 @@ function test_ALPH() {
     var r = ALPH()("foo bar", 7);
     assert(S.ERROR == r.status && P.ALPH == r.operator && r.index == 7 && r.length == 0, case_name + "." + (++case_i));
 
-    console.log('Case ' + case_name + ' passed');
+    console.log('Result for ' + case_name + ', passed: ' + case_i);
 }
 
 function test_UNICODE() {
     var case_name = arguments.callee.name;
     var case_i = 0;
-    console.log('Begin case ' + case_name);
+    console.log('Begin ' + case_name);
 
     var UNICODE = paka.UNICODE;
     var S = paka.S;
@@ -116,13 +116,13 @@ function test_UNICODE() {
     var r = UNICODE()("foo bar", 7);
     assert(S.ERROR == r.status && P.UNICODE == r.operator && r.index == 7 && r.length == 0, case_name + "." + (++case_i));
 
-    console.log('Case ' + case_name + ' passed');
+    console.log('Result for ' + case_name + ', passed: ' + case_i);
 }
 
 function test_DIGIT() {
     var case_name = arguments.callee.name;
     var case_i = 0;
-    console.log('Begin case ' + case_name);
+    console.log('Begin ' + case_name);
 
     var DIGIT = paka.DIGIT;
     var S = paka.S;
@@ -144,13 +144,45 @@ function test_DIGIT() {
     var r = DIGIT()("123 234", 7);
     assert(S.ERROR == r.status && P.DIGIT == r.operator && r.index == 7 && r.length == 0, case_name + "." + (++case_i));
 
-    console.log('Case ' + case_name + ' passed');
+    console.log('Result for ' + case_name + ', passed: ' + case_i);
+}
+
+
+function test_HEX_DIGIT() {
+    var case_name = arguments.callee.name;
+    var case_i = 0;
+    console.log('Begin ' + case_name);
+
+    var HEX_DIGIT = paka.HEX_DIGIT;
+    var S = paka.S;
+    var R = paka.R;
+    var P = paka.P;
+    
+    var r = HEX_DIGIT()("123", 0);
+    assert(S.OK == r.status && P.HEX_DIGIT == r.operator && r.length == 1, case_name + "." + (++case_i));
+
+    var r = HEX_DIGIT()("123 234", 0);
+    assert(S.OK == r.status && P.HEX_DIGIT == r.operator && r.length == 1, case_name + "." + (++case_i));
+
+    var r = HEX_DIGIT()(" 123 234", 1);
+    assert(S.OK == r.status && P.HEX_DIGIT == r.operator && r.index == 1 && r.length == 1, case_name + "." + (++case_i));
+
+    var r = HEX_DIGIT()("f 123 234", 0);
+    assert(S.OK == r.status && P.HEX_DIGIT == r.operator && r.index == 0 && r.length == 1, case_name + "." + (++case_i));
+
+    var r = HEX_DIGIT()("123 234", 7);
+    assert(S.ERROR == r.status && P.HEX_DIGIT == r.operator && r.index == 7 && r.length == 0, case_name + "." + (++case_i));
+
+    var r = HEX_DIGIT()("g 123 234", 0);
+    assert(S.ERROR == r.status && P.HEX_DIGIT == r.operator && r.index == 0 && r.length == 0, case_name + "." + (++case_i));
+
+    console.log('Result for ' + case_name + ', passed: ' + case_i);
 }
 
 function test_INT() {
     var case_name = arguments.callee.name;
     var case_i = 0;
-    console.log('Begin case ' + case_name);
+    console.log('Begin ' + case_name);
 
     var INT = paka.INT;
     var S = paka.S;
@@ -178,13 +210,13 @@ function test_INT() {
     var r = INT()("-", 0);
     assert(S.ERROR == r.status && P.INT == r.operator, case_name + "." + (++case_i));
 
-    console.log('Case ' + case_name + ' passed');
+    console.log('Result for ' + case_name + ', passed: ' + case_i);
 }
 
 function test_UINT() {
     var case_name = arguments.callee.name;
     var case_i = 0;
-    console.log('Begin case ' + case_name);
+    console.log('Begin ' + case_name);
 
     var UINT = paka.UINT;
     var S = paka.S;
@@ -209,13 +241,13 @@ function test_UINT() {
     var r = UINT()("-", 0);
     assert(S.ERROR == r.status && P.UINT == r.operator, case_name + "." + (++case_i));
 
-    console.log('Case ' + case_name + ' passed');
+    console.log('Result for ' + case_name + ', passed: ' + case_i);
 }
 
 function test_SYM() {
     var case_name = arguments.callee.name;
     var case_i = 0;
-    console.log('Begin case ' + case_name);
+    console.log('Begin ' + case_name);
 
     var SYM = paka.SYM;
     var S = paka.S;
@@ -239,13 +271,13 @@ function test_SYM() {
     var r = SYM("+")("+", 1);
     assert(S.ERROR == r.status, case_name + "." + (++case_i));
 
-    console.log('Case ' + case_name + ' passed');
+    console.log('Result for ' + case_name + ', passed: ' + case_i);
 }
 
 function test_DQ_STR() {
     var case_name = arguments.callee.name;
     var case_i = 0;
-    console.log('Begin case ' + case_name);
+    console.log('Begin ' + case_name);
 
     var DQ_STR = paka.DQ_STR;
     var S = paka.S;
@@ -270,13 +302,16 @@ function test_DQ_STR() {
     var r = DQ_STR()('abc"', 0);
     assert(S.ERROR == r.status && P.DQ_STR == r.operator, case_name + "." + (++case_i));
 
-    console.log('Case ' + case_name + ' passed');
+    var r = DQ_STR()('"\\"', 0);
+    assert(S.ERROR == r.status && P.DQ_STR == r.operator && r.length == 0, case_name + "." + (++case_i));
+
+    console.log('Result for ' + case_name + ', passed: ' + case_i);
 }
 
 function test_SQ_STR() {
     var case_name = arguments.callee.name;
     var case_i = 0;
-    console.log('Begin case ' + case_name);
+    console.log('Begin ' + case_name);
 
     var SQ_STR = paka.SQ_STR;
     var S = paka.S;
@@ -301,13 +336,16 @@ function test_SQ_STR() {
     var r = SQ_STR()("abc'", 0);
     assert(S.ERROR == r.status && P.SQ_STR == r.operator, case_name + "." + (++case_i));
 
-    console.log('Case ' + case_name + ' passed');
+    var r = SQ_STR()("'\\'", 0);
+    assert(S.ERROR == r.status && P.SQ_STR == r.operator && r.length == 0, case_name + "." + (++case_i));
+
+    console.log('Result for ' + case_name + ', passed: ' + case_i);
 }
 
 function test_IN() {
     var case_name = arguments.callee.name;
     var case_i = 0;
-    console.log('Begin case ' + case_name);
+    console.log('Begin ' + case_name);
 
     var IN = paka.IN;
     var S = paka.S;
@@ -328,13 +366,13 @@ function test_IN() {
     var r = IN("*/+-")("foo+bar", 0);
     assert(S.ERROR == r.status, case_name + "." + (++case_i));
 
-    console.log('Case ' + case_name + ' passed');
+    console.log('Result for ' + case_name + ', passed: ' + case_i);
 }
 
 function test_SEQ() {
     var case_name = arguments.callee.name;
     var case_i = 0;
-    console.log('Begin case ' + case_name);
+    console.log('Begin ' + case_name);
 
     var WS = paka.WS ;
     var SYM = paka.SYM;
@@ -360,13 +398,13 @@ function test_SEQ() {
     var r = SEQ(SYM('foo'), WS(1), SYM('bar'))("bar foo", 0);
     assert(S.ERROR == r.status, case_name + "." + (++case_i));
 
-    console.log('Case ' + case_name + ' passed');
+    console.log('Result for ' + case_name + ', passed: ' + case_i);
 }
 
 function test_CONCAT() {
     var case_name = arguments.callee.name;
     var case_i = 0;
-    console.log('Begin case ' + case_name);
+    console.log('Begin ' + case_name);
 
     var WS = paka.WS ;
     var SYM = paka.SYM;
@@ -383,13 +421,13 @@ function test_CONCAT() {
     var r = CONCAT('foo', '+', 'bar')("foo + bar", 0);
     assert(S.OK == r.status && r.index == 0 && r.length == 9, case_name + "." + (++case_i));
 
-    console.log('Case ' + case_name + ' passed');
+    console.log('Result for ' + case_name + ', passed: ' + case_i);
 }
 
 function test_OR() {
     var case_name = arguments.callee.name;
     var case_i = 0;
-    console.log('Begin case ' + case_name);
+    console.log('Begin ' + case_name);
 
     var WS = paka.WS ;
     var SYM = paka.SYM;
@@ -413,13 +451,13 @@ function test_OR() {
     var r = OR(SYM('foo'), SYM('bar'))("fo ba", 0);
     assert(S.ERROR == r.status, case_name + "." + (++case_i));
 
-    console.log('Case ' + case_name + ' passed');
+    console.log('Result for ' + case_name + ', passed: ' + case_i);
 }
 
 function test_REPEAT() {
     var case_name = arguments.callee.name;
     var case_i = 0;
-    console.log('Begin case ' + case_name);
+    console.log('Begin ' + case_name);
 
     var WS = paka.WS ;
     var SYM = paka.SYM;
@@ -463,13 +501,13 @@ function test_REPEAT() {
     assert(S.ERROR == r.status && P.REPEAT == r.operator && r.children.length == 3
         , case_name + "." + (++case_i));
 
-    console.log('Case ' + case_name + ' passed');
+    console.log('Result for ' + case_name + ', passed: ' + case_i);
 }
 
 function test_OPT() {
     var case_name = arguments.callee.name;
     var case_i = 0;
-    console.log('Begin case ' + case_name);
+    console.log('Begin ' + case_name);
 
     var WS = paka.WS ;
     var SYM = paka.SYM;
@@ -497,13 +535,13 @@ function test_OPT() {
     assert(S.OK == r.status && P.SEQ == r.operator && r.index == 0 && r.length == 9 && r.children.length == 5
         , case_name + "." + (++case_i));
 
-    console.log('Case ' + case_name + ' passed');
+    console.log('Result for ' + case_name + ', passed: ' + case_i);
 }
 
 function test_LIST() {
     var case_name = arguments.callee.name;
     var case_i = 0;
-    console.log('Begin case ' + case_name);
+    console.log('Begin ' + case_name);
 
     var LIST = paka.LIST;
     var INT = paka.INT;
@@ -521,6 +559,7 @@ function test_LIST() {
     assert(r.children[0].operator == P.INT);
     assert(r.children[1].operator == P.INT);
     assert(r.children[2].operator == P.INT);
+    ++case_i;
 
     var r = LIST(INT(), ',', true)('123, 234, 456', 0);
     assert(S.OK == r.status);
@@ -532,6 +571,7 @@ function test_LIST() {
     assert(r.children[2].operator == P.INT);
     assert(r.children[3].operator == P.SYM);
     assert(r.children[4].operator == P.INT);
+    ++case_i;
 
     var r = LIST(INT(), ',')('123, 234, 456,', 0);
     assert(S.OK == r.status);
@@ -541,8 +581,7 @@ function test_LIST() {
     assert(r.children[0].operator == P.INT);
     assert(r.children[1].operator == P.INT);
     assert(r.children[2].operator == P.INT);
-
-    console.log('Case ' + case_name + ' passed');
+    ++case_i;
 
     var r = LIST(INT(), ',')(' 123, 234, 456,', 0);
     assert(S.OK == r.status);
@@ -552,20 +591,22 @@ function test_LIST() {
     assert(r.children[0].operator == P.INT);
     assert(r.children[1].operator == P.INT);
     assert(r.children[2].operator == P.INT);
+    ++case_i;
 
     var r = LIST(INT(), ',')(' abc, 234, 456,', 0);
     assert(S.ERROR == r.status);
     assert(P.LIST == r.operator);
     assert(r.index == 0 && r.length == 0);
     assert(r.children == null);
+    ++case_i;
 
-    console.log('Case ' + case_name + ' passed');
+    console.log('Result for ' + case_name + ', passed: ' + case_i);
 }
 
 function test_$() {
     var case_name = arguments.callee.name;
     var case_i = 0;
-    console.log('Begin case ' + case_name);
+    console.log('Begin ' + case_name);
 
     var WS = paka.WS ;
     var SYM = paka.SYM;
@@ -593,13 +634,14 @@ function test_$() {
     var r = parser.parse('C', 'foo +bar');
     assert(S.ERROR == r.status && 'C' == r.rule , case_name + "." + (++case_i));
     
-    console.log('Case ' + case_name + ' passed');
+    console.log('Result for ' + case_name + ', passed: ' + case_i);
 }
 
 test_WS();
 test_ALPH();
 test_UNICODE();
 test_DIGIT();
+test_HEX_DIGIT();
 test_INT();
 test_UINT();
 test_SYM();

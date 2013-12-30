@@ -12,6 +12,7 @@ module paka {
         ALPH : 'ALPH', //alphabet
         UNICODE : 'UNICODE', //unicode
         DIGIT : 'DIGIT', // digit
+        HEX_DIGIT : 'HEX_DIGIT', // hex digit
         INT : 'INT', // signed integer
         UINT : 'UINT', // unsigned integer
         SYM : 'SYM', // symbol
@@ -158,6 +159,11 @@ module paka {
         };
     }
 
+    // Hex Digit: matches hex digit, example: 'f' 
+    export function HEX_DIGIT() {
+        return _make_alias('HEX_DIGIT', P.HEX_DIGIT, OR(RANGE('0', '9'), RANGE('a', 'f'), RANGE('A', 'F')));
+    }
+
     // Int: matches signed integer, example: '-123'
     export function INT(max_len: number = 10) {
         var _func = 'INT';
@@ -249,7 +255,22 @@ module paka {
         if ('string' != typeof(quote) || 1 != quote.length) {
             throw 'Invalid quote for Q_STR';
         }
-        var _parser = SEQ(quote, REPEAT(OR('\\\\', '\\' + quote, NOT_IN(quote))), quote);
+        var _parser = SEQ(
+            quote, 
+            REPEAT(OR(
+                  '\\' + quote
+                , '\\\\'
+                , '\\/'
+                , '\\b'
+                , '\\f'
+                , '\\n'
+                , '\\r'
+                , '\\t'
+                , '\\u' + REPEAT(HEX_DIGIT(), 4, 4)
+                , NOT_IN(quote + '\\')
+            ))
+            , quote
+        );
         return _make_alias('Q_STR(' + quote + ')', P.Q_STR, _parser);
     }
 

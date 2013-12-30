@@ -11,6 +11,7 @@
         ALPH: 'ALPH',
         UNICODE: 'UNICODE',
         DIGIT: 'DIGIT',
+        HEX_DIGIT: 'HEX_DIGIT',
         INT: 'INT',
         UINT: 'UINT',
         SYM: 'SYM',
@@ -150,6 +151,12 @@
     }
     paka.DIGIT = DIGIT;
 
+    // Hex Digit: matches hex digit, example: 'f'
+    function HEX_DIGIT() {
+        return _make_alias('HEX_DIGIT', paka.P.HEX_DIGIT, OR(RANGE('0', '9'), RANGE('a', 'f'), RANGE('A', 'F')));
+    }
+    paka.HEX_DIGIT = HEX_DIGIT;
+
     // Int: matches signed integer, example: '-123'
     function INT(max_len) {
         if (typeof max_len === "undefined") { max_len = 10; }
@@ -250,7 +257,7 @@
         if ('string' != typeof (quote) || 1 != quote.length) {
             throw 'Invalid quote for Q_STR';
         }
-        var _parser = SEQ(quote, REPEAT(OR('\\\\', '\\' + quote, NOT_IN(quote))), quote);
+        var _parser = SEQ(quote, REPEAT(OR('\\' + quote, '\\\\', '\\/', '\\b', '\\f', '\\n', '\\r', '\\t', '\\u' + REPEAT(HEX_DIGIT(), 4, 4), NOT_IN(quote + '\\'))), quote);
         return _make_alias('Q_STR(' + quote + ')', paka.P.Q_STR, _parser);
     }
     paka.Q_STR = Q_STR;
