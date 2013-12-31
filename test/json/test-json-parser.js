@@ -25,6 +25,11 @@ print_input(json);
 var ast = parser.parse(json);
 print_output(ast);
 
+var json = '"\\\\"';
+print_input(json);
+var ast = parser.parse(json);
+print_output(ast);
+
 var json = 'true';
 print_input(json);
 var ast = parser.parse(json);
@@ -55,7 +60,7 @@ print_input(json);
 var ast = parser.parse(json);
 print_output(ast);
 
-var json = '{ "k 1" : "v 1", "k\\"2" : "v\\"2" }';
+var json = '{ "k 1" : "v 1", "k\\"2" : "a\'b" }';
 print_input(json);
 var ast = parser.parse(json);
 print_output(ast);

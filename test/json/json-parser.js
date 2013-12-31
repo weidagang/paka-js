@@ -12,10 +12,6 @@ function help() {
     console.log('Example: ' + PROGRAM + '{ "k1" : "v1", "k2" : 123, "k3" : false, "k4" : null }');
 }
 
-function escape_str(str) {
-    return str.substring(1, str.length - 1).replace('\\\\', '\\').replace('\\"', '"');
-}
-
 function parse(src) {
     var INT = paka.INT;
     var EOF = paka.EOF;
@@ -44,7 +40,14 @@ function parse(src) {
         'Num' : function(r) { r.extra = parseInt(r.text()); },
         'Null' : function(r) { r.extra = null },
         'Bool' : function(r) { r.extra = ('true' == r.text()); },
-        'String' : function(r) { r.extra = escape_str(r.text()); },
+        'String' : function(r) { 
+            var str = r.text().substring(1, r.text().length - 1);
+            var escape_map = { '\\\\' : '\\', '\\"' : '"', '\\/' : '/', '\\b' : '\b', '\\f' : '\f', '\\n' : '\n', '\\r' : '\r', '\\t' : '\t' };
+            for (var key in escape_map) {
+                str = str.replace(key, escape_map[key]);
+            }
+            r.extra = str;
+        },
         'Key' : function(r) { },
         'Value' : function(r) { r.extra = r.children[0].extra; },
         'KeyValuePair' : function(r) { r.extra = { key : r.children[0].extra, value : r.children[2].extra }; },
