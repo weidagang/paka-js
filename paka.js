@@ -61,7 +61,7 @@
     paka.R = R;
     ;
 
-    function define(grammar, action) {
+    function create(grammar, action) {
         _grammar = grammar;
         _action = action;
 
@@ -73,7 +73,7 @@
             }
         };
     }
-    paka.define = define;
+    paka.create = create;
 
     // ======== parsers ========
     // End of source code: matches the end of source code

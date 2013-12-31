@@ -62,7 +62,7 @@ function calculate(src) {
         'Arithmetic' : function(r) { r.extra = r.children[0].extra; }
     }
 
-    var parser = paka.define(grammar, action);
+    var parser = paka.create(grammar, action);
     var ast = parser.parse('Arithmetic', src);
 
     //console.log(util.inspect(ast, false, 10));

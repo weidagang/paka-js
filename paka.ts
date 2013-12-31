@@ -76,7 +76,7 @@ module paka {
         }
     };
    
-    export function define(grammar, action) {
+    export function create(grammar, action) {
         _grammar = grammar;
         _action = action;
         

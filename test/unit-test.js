@@ -745,7 +745,7 @@ function test_$() {
         'B' : SYM('bar')
     };
 
-    var parser = paka.define(grammar);
+    var parser = paka.create(grammar);
 
     var r = parser.parse('C', 'foo+bar');
     assert(S.OK == r.status && 'C' == r.rule && P.SEQ == r.operator && r.index == 0 && r.length == 7
