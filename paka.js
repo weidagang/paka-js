@@ -12,6 +12,7 @@
         UNICODE: 'UNICODE',
         DIGIT: 'DIGIT',
         HEX_DIGIT: 'HEX_DIGIT',
+        NUM: 'NUM',
         INT: 'INT',
         UINT: 'UINT',
         SYM: 'SYM',
@@ -158,6 +159,14 @@
         return _make_alias('HEX_DIGIT', paka.P.HEX_DIGIT, OR(RANGE('0', '9'), RANGE('a', 'f'), RANGE('A', 'F')));
     }
     paka.HEX_DIGIT = HEX_DIGIT;
+
+    // Number: matches number, example: '-123e-8'
+    function NUM() {
+        var _parser = SEQ(OPT('-'), OR('0', SEQ(RANGE('1', '9'), REPEAT(DIGIT()))), OPT(SEQ('.', REPEAT(DIGIT(), 1))), OPT(SEQ(OR('e', 'E'), OPT(OR('+', '-')), REPEAT(DIGIT(), 1))));
+
+        return _make_alias('NUM', paka.P.NUM, _parser);
+    }
+    paka.NUM = NUM;
 
     // Int: matches signed integer, example: '-123'
     function INT(max_len) {
@@ -615,13 +624,7 @@
     paka.REPEAT = REPEAT;
 
     function OPT(parser) {
-        return function (buffer, index, depth) {
-            if (typeof depth === "undefined") { depth = 0; }
-            var repeat = REPEAT(parser, 0, 1);
-            var r = repeat(buffer, index, depth);
-            r.operator = paka.P.OPT;
-            return r;
-        };
+        return _make_alias('OPT', paka.P.OPT, REPEAT(parser, 0, 1));
     }
     paka.OPT = OPT;
 
@@ -718,7 +721,7 @@
             var r = _parser(buffer, index, depth);
 
             if (paka.S.OK == r.status) {
-                r = R.ok(operator, r.index, r.length, null);
+                r = R.ok(operator, r.index, r.length, r.children);
             } else {
                 r = R.error(operator, index, null, null);
             }

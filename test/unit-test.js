@@ -213,6 +213,55 @@ function test_INT() {
     console.log('Result for ' + case_name + ', passed: ' + case_i);
 }
 
+function test_NUM() {
+    var case_name = arguments.callee.name;
+    var case_i = 0;
+    console.log('Begin ' + case_name);
+
+    var NUM = paka.NUM;
+    var S = paka.S;
+    var R = paka.R;
+    var P = paka.P;
+    
+    var r = NUM()("0", 0);
+    assert(S.OK == r.status && P.NUM == r.operator && r.length == 1, case_name + "." + (++case_i));
+
+    var r = NUM()("0.0", 0);
+    assert(S.OK == r.status && P.NUM == r.operator && r.length == 3, case_name + "." + (++case_i));
+
+    var r = NUM()("123", 0);
+    assert(S.OK == r.status && P.NUM == r.operator && r.length == 3, case_name + "." + (++case_i));
+
+    var r = NUM(3)("123", 0);
+    assert(S.OK == r.status && P.NUM == r.operator && r.length == 3, case_name + "." + (++case_i));
+
+    var r = NUM()("-123", 0);
+    assert(S.OK == r.status && P.NUM == r.operator && r.length == 4, case_name + "." + (++case_i));
+
+    var r = NUM()("0", 0);
+    assert(S.OK == r.status && P.NUM == r.operator && r.length == 1, case_name + "." + (++case_i));
+
+    var r = NUM()("-1234e-8", 0);
+    assert(S.OK == r.status && P.NUM == r.operator && r.length == 8, case_name + "." + (++case_i));
+
+    var r = NUM()("1234e8", 0);
+    assert(S.OK == r.status && P.NUM == r.operator && r.length == 6, case_name + "." + (++case_i));
+
+    var r = NUM()("123.2e+8", 0);
+    assert(S.OK == r.status && P.NUM == r.operator && r.length == 8, case_name + "." + (++case_i));
+
+    var r = NUM()("-123.2e-8", 0);
+    assert(S.OK == r.status && P.NUM == r.operator && r.length == 9, case_name + "." + (++case_i));
+
+    var r = NUM()("-", 0);
+    assert(S.ERROR == r.status && P.NUM == r.operator, case_name + "." + (++case_i));
+
+    var r = NUM()("abc", 0);
+    assert(S.ERROR == r.status && P.NUM == r.operator, case_name + "." + (++case_i));
+
+    console.log('Result for ' + case_name + ', passed: ' + case_i);
+}
+
 function test_UINT() {
     var case_name = arguments.callee.name;
     var case_i = 0;
@@ -713,6 +762,7 @@ test_ALPH();
 test_UNICODE();
 test_DIGIT();
 test_HEX_DIGIT();
+test_NUM();
 test_INT();
 test_UINT();
 test_SYM();

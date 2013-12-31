@@ -1,136 +1,79 @@
-paka.js 
-=======
+Evented I/O for V8 javascript.
+===
 
-Paka.js is a higher-order function based parser combinator. It's designed for creating language parsers in JavaScript. Unlike external parser generators such as ANTLR, there's no static code generation involved. When writing language parsers in JavaScript, you can define the language grammar and semantics actions with the embedded DSL of paka.js. It is much light-weighted than external parser generators.
+### To build:
 
-### Examples ###
+Prerequisites (Unix only):
 
-#### 1. Caculator ####
+    * GCC 4.2 or newer
+    * Python 2.6 or 2.7
+    * GNU Make 3.81 or newer
+    * libexecinfo (FreeBSD and OpenBSD only)
 
-The following code implements a working caculator in less than 100 lines of code. The hightlight is that the language grammar is written in the embedded DSL, it's clean and easy to maintain.
+Unix/Macintosh:
 
-```javascript
-var paka = require('paka');
+    ./configure
+    make
+    make install
 
-function calculate(src) {
-    var INT = paka.INT;
-    var EOF = paka.EOF;
-    var CONCAT = paka.CONCAT;
-    var OR = paka.OR;
-    var LIST = paka.LIST;
-    var $ = paka.$;
+If your python binary is in a non-standard location or has a
+non-standard name, run the following instead:
 
-    var grammar = {
-        'Arithmetic' : CONCAT($('Expr'), EOF),
-        'Expr' : LIST($('Term'), $('TermOp'), true),
-        'Term' : LIST($('Factor'), $('FactorOp'), true),
-        'TermOp' : OR('+', '-'),
-        'Factor' : OR($('P-Expr'), $('Num')),
-        'FactorOp' : OR('*', '/'),
-        'P-Expr' : CONCAT('(', $('Expr'), ')'),
-        'Num' : INT()
-    };
+    export PYTHON=/path/to/python
+    $PYTHON ./configure
+    make
+    make install
 
-    var actions = {
-        'Num' : function(r) { r.extra = parseInt(r.text()); },
-        'Factor' : function(r) { r.extra = r.children[0].extra; },
-        'Term' : function(r) { 
-            r.extra = r.children[0].extra;
-            for (var i = 1; i < r.children.length; i += 2) {
-                var factor_op = r.children[i];
-                var factor = r.children[i+1];
-                if ('*' == factor_op.text()) {
-                    r.extra *= factor.extra;
-                }
-                else if ('/' == factor_op.text()) {
-                    r.extra /= factor.extra;
-                }
-            }
-        },
-        'Expr' : function(r) {
-            r.extra = r.children[0].extra;
-            for (var i = 1; i < r.children.length; i += 2) {
-                var factor_op = r.children[i];        
-                var factor = r.children[i+1];
-                if ('+' == factor_op.text()) {
-                    r.extra += factor.extra;
-                }
-                else if ('-' == factor_op.text()) {
-                    r.extra -= factor.extra;
-                }
-            }
-        },
-        'P-Expr' : function(r) { r.extra = r.children[1].extra; },
-        'Arithmetic' : function(r) { r.extra = r.children[0].extra; }
-    }
+Prerequisites (Windows only):
 
-    var parser = paka.define(grammar, actions);
-    var ast = parser.parse('Arithmetic', src);
+    * Python 2.6 or 2.7
+    * Visual Studio 2010 or 2012
 
-    if (paka.S.OK == ast.status) {
-        console.log(src + ' = ' + ast.extra);
-    }
-    else {
-        console.error('Invalid expression');
-    }
-}
-```
+Windows:
 
-#### 2. JSON Parser ####
+    vcbuild nosign
 
-The following code implements a JSON parser which creates a JSON object from its string representation. 
+You can download pre-built binaries for various operating systems from
+[http://nodejs.org/download/](http://nodejs.org/download/).  The Windows
+and OS X installers will prompt you for the location to install to.
+The tarballs are self-contained; you can extract them to a local directory
+with:
 
-```javascript
-function parse(src) {
-    var INT = paka.INT;
-    var EOF = paka.EOF;
-    var CONCAT = paka.CONCAT;
-    var OR = paka.OR;
-    var REPEAT = paka.REPEAT;
-    var OPT = paka.OPT;
-    var DQ_STR = paka.DQ_STR;
-    var ENCLOSED_LIST = paka.ENCLOSED_LIST;
-    var $ = paka.$;
-    
-    var grammar = {
-        'JSON' : CONCAT($('Value'), EOF),
-        'Value' : OR($('Num'), $('Null'), $('Bool'), $('String'), $('Object'), $('Array')),
-        'Object' : ENCLOSED_LIST('{', $('KeyValuePair'), ',', '}'),
-        'KeyValuePair' : CONCAT($('Key'), ':', $('Value')),
-        'Key' : $('String'),
-        'Num' : INT(),
-        'Null' : 'null',
-        'Bool' : OR('false', 'true'),
-        'String' : DQ_STR(),
-        'Array' : ENCLOSED_LIST('[', $('Value'), ',', ']')
-    };
+    tar xzf /path/to/node-<version>-<platform>-<arch>.tar.gz
 
-    var actions = {
-        'Num' : function(r) { r.extra = parseInt(r.text()); },
-        'Null' : function(r) { r.extra = null },
-        'Bool' : function(r) { r.extra = ('true' == r.text()); },
-        'String' : function(r) { r.extra = escape_str(r.text()); },
-        'Key' : function(r) { },
-        'Value' : function(r) { r.extra = r.children[0].extra; },
-        'KeyValuePair' : function(r) { r.extra = { key : r.children[0].extra, value : r.children[2].extra }; },
-        'Object' : function(r) { 
-            r.extra = {};
-            for (var i = 0; null != r.children && i < r.children.length; ++i) {
-                r.extra[r.children[i].extra.key] = r.children[i].extra.value;
-            }
-        },
-        'Array' : function(r) {
-            r.extra = [];
-            for (var i = 0; null != r.children && i < r.children.length; ++i) {
-                r.extra.push(r.children[i].extra);
-            }
-        },
-        'JSON' : function(r) { r.extra = r.children[0].extra; }
-    }
+Or system-wide with:
 
-    var parser = paka.define(grammar, actions);
-    var ast = parser.parse('JSON', src);
+    cd /usr/local && tar --strip-components 1 -xzf \
+                         /path/to/node-<version>-<platform>-<arch>.tar.gz
 
-    return ast;
-}
-```
+### To run the tests:
+
+Unix/Macintosh:
+
+    make test
+
+Windows:
+
+    vcbuild test
+
+### To build the documentation:
+
+    make doc
+
+### To read the documentation:
+
+    man doc/node.1
+
+Resources for Newcomers
+---
+  - [The Wiki](https://github.com/joyent/node/wiki)
+  - [nodejs.org](http://nodejs.org/)
+  - [how to install node.js and npm (node package manager)](http://www.joyent.com/blog/installing-node-and-npm/)
+  - [list of modules](https://github.com/joyent/node/wiki/modules)
+  - [searching the npm registry](http://npmjs.org/)
+  - [list of companies and projects using node](https://github.com/joyent/node/wiki/Projects,-Applications,-and-Companies-Using-Node)
+  - [node.js mailing list](http://groups.google.com/group/nodejs)
+  - irc chatroom, [#node.js on freenode.net](http://webchat.freenode.net?channels=node.js&uio=d4)
+  - [community](https://github.com/joyent/node/wiki/Community)
+  - [contributing](https://github.com/joyent/node/wiki/Contributing)
+  - [big list of all the helpful wiki pages](https://github.com/joyent/node/wiki/_pages)

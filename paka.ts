@@ -13,6 +13,7 @@ module paka {
         UNICODE : 'UNICODE', //unicode
         DIGIT : 'DIGIT', // digit
         HEX_DIGIT : 'HEX_DIGIT', // hex digit
+        NUM : 'NUM', // number 
         INT : 'INT', // signed integer
         UINT : 'UINT', // unsigned integer
         SYM : 'SYM', // symbol
@@ -164,6 +165,28 @@ module paka {
     // Hex Digit: matches hex digit, example: 'f' 
     export function HEX_DIGIT() {
         return _make_alias('HEX_DIGIT', P.HEX_DIGIT, OR(RANGE('0', '9'), RANGE('a', 'f'), RANGE('A', 'F')));
+    }
+
+    // Number: matches number, example: '-123e-8'
+    export function NUM() {
+        var _parser = 
+        SEQ(
+            OPT('-'), 
+            OR(
+                '0',
+                SEQ(RANGE('1','9'), REPEAT(DIGIT())) 
+            ),
+            OPT(SEQ('.', REPEAT(DIGIT(), 1))),
+            OPT(
+                SEQ(
+                    OR('e', 'E'),
+                    OPT(OR('+', '-')),
+                    REPEAT(DIGIT(), 1)
+                )
+            )
+        );
+        
+        return _make_alias('NUM', P.NUM, _parser);
     }
 
     // Int: matches signed integer, example: '-123'
@@ -553,7 +576,7 @@ module paka {
         };
     }
 
-    export function REPEAT(parser: Function, min_times: number = 0, max_times: number = Number.MAX_VALUE) {
+    export function REPEAT(parser, min_times: number = 0, max_times: number = Number.MAX_VALUE) {
         var _func = 'REPEAT';
 
         return function(buffer: string, index: number, depth: number = 0): R {
@@ -593,13 +616,8 @@ module paka {
         };
     }
 
-    export function OPT(parser: Function) {
-        return function(buffer: string, index: number, depth: number = 0): R {
-            var repeat = REPEAT(parser, 0, 1);
-            var r = repeat(buffer, index, depth);
-            r.operator = P.OPT;
-            return r;
-        };
+    export function OPT(parser) {
+        return _make_alias('OPT', P.OPT, REPEAT(parser, 0, 1));
     }
      
     export function $(rule: string) {
@@ -691,7 +709,7 @@ module paka {
             var r: R = _parser(buffer, index, depth);
 
             if (S.OK == r.status) {
-                r = R.ok(operator, r.index, r.length, null);
+                r = R.ok(operator, r.index, r.length, r.children);
             }
             else {
                 r = R.error(operator, index, null, null);
