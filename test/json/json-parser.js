@@ -13,7 +13,7 @@ function help() {
 }
 
 function parse(src) {
-    var INT = paka.INT;
+    var NUM = paka.NUM;
     var EOF = paka.EOF;
     var CONCAT = paka.CONCAT;
     var OR = paka.OR;
@@ -29,7 +29,7 @@ function parse(src) {
         'Object' : ENCLOSED_LIST('{', $('KeyValuePair'), ',', '}'),
         'KeyValuePair' : CONCAT($('Key'), ':', $('Value')),
         'Key' : $('String'),
-        'Num' : INT(),
+        'Num' : NUM(),
         'Null' : 'null',
         'Bool' : OR('false', 'true'),
         'String' : DQ_STR(),
@@ -37,7 +37,7 @@ function parse(src) {
     };
 
     var actions = {
-        'Num' : function(r) { r.extra = parseInt(r.text()); },
+        'Num' : function(r) { r.extra = parseFloat(r.text()); },
         'Null' : function(r) { r.extra = null },
         'Bool' : function(r) { r.extra = ('true' == r.text()); },
         'String' : function(r) { 

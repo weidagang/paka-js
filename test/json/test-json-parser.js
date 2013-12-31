@@ -20,7 +20,7 @@ print_input(json);
 var ast = parser.parse(json);
 print_output(ast);
 
-var json = '123';
+var json = '123e+8';
 print_input(json);
 var ast = parser.parse(json);
 print_output(ast);
