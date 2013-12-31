@@ -2,13 +2,13 @@
 
 var calculator = require('./calculator.js');
 
-calculator.calculate('1 + 1');
+calculator.calculate('1.1 + 1.5');
 console.log('');
 
 calculator.calculate('-1 + 1');
 console.log('');
 
-calculator.calculate('((123))');
+calculator.calculate('((1e+8+1))');
 console.log('');
 
 calculator.calculate('((1+1) * (2+2))');

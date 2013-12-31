@@ -13,7 +13,7 @@ The following code implements a working caculator in less than 100 lines of code
 var paka = require('paka');
 
 function calculate(src) {
-    var INT = paka.INT;
+    var NUM = paka.NUM;
     var EOF = paka.EOF;
     var CONCAT = paka.CONCAT;
     var OR = paka.OR;
@@ -28,11 +28,11 @@ function calculate(src) {
         'Factor' : OR($('P-Expr'), $('Num')),
         'FactorOp' : OR('*', '/'),
         'P-Expr' : CONCAT('(', $('Expr'), ')'),
-        'Num' : INT()
+        'Num' : NUM()
     };
 
     var actions = {
-        'Num' : function(r) { r.extra = parseInt(r.text()); },
+        'Num' : function(r) { r.extra = parseFloat(r.text()); },
         'Factor' : function(r) { r.extra = r.children[0].extra; },
         'Term' : function(r) { 
             r.extra = r.children[0].extra;
