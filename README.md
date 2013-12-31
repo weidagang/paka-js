@@ -78,7 +78,7 @@ function calculate(src) {
 
 #### 2. JSON Parser ####
 
-The following code implements a JSON parser which creates a JSON object from its string representation. JSON syntax reference: [http://www.json.org/fatfree.html](http://www.json.org/fatfree.html)
+The following code implements a JSON parser which creates a JSON object from its string representation. Reference: [http://www.json.org/fatfree.html](http://www.json.org/fatfree.html)
 
 ```javascript
 function parse(src) {
