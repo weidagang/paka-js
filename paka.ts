@@ -190,7 +190,7 @@ module paka {
     }
 
     // Int: matches signed integer, example: '-123'
-    export function INT(max_len: number = 10) {
+    export function INT(max_len: number = Number.MAX_VALUE) {
         var _func = 'INT';
         return function(buffer: string, index: number, depth: number = 0) {
             _trace(_func, depth, true);
@@ -203,7 +203,7 @@ module paka {
     }
 
     // Unsigned Int: matches unsigned signed integer, example: '123'
-    export function UINT(max_len: number = 10) {
+    export function UINT(max_len: number = Number.MAX_VALUE) {
         var _func = 'UINT';
         return function(buffer: string, index: number, depth: number = 0) {
             _trace(_func, depth, true);

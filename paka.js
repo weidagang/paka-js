@@ -170,7 +170,7 @@
 
     // Int: matches signed integer, example: '-123'
     function INT(max_len) {
-        if (typeof max_len === "undefined") { max_len = 10; }
+        if (typeof max_len === "undefined") { max_len = Number.MAX_VALUE; }
         var _func = 'INT';
         return function (buffer, index, depth) {
             if (typeof depth === "undefined") { depth = 0; }
@@ -186,7 +186,7 @@
 
     // Unsigned Int: matches unsigned signed integer, example: '123'
     function UINT(max_len) {
-        if (typeof max_len === "undefined") { max_len = 10; }
+        if (typeof max_len === "undefined") { max_len = Number.MAX_VALUE; }
         var _func = 'UINT';
         return function (buffer, index, depth) {
             if (typeof depth === "undefined") { depth = 0; }
