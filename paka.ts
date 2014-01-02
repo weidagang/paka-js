@@ -105,29 +105,7 @@ module paka {
     
     // Whitespace: matches white spaces, example: ' ', '\t'
     export function WS(min_len: number = 1, max_len: number = Number.MAX_VALUE) {
-        return function(buffer: string, index: number, depth: number) {
-            var r: R;
-            var idx: number = 0;
-            var len: number = 0;
-            
-            for (idx = index; idx < buffer.length && idx - index < max_len; ++idx) {
-                var c = buffer.charAt(idx);
-                if (' ' != c && '\t' != c && '\n' != c && '\r' != c) {
-                    break;
-                }
-            }
-
-            len = idx - index;
-
-            if (len >= min_len && len <= max_len) {
-                return R.ok(P.WS, index, len, null);    
-            }
-            else {
-                r = R.error(P.WS, index, null, "Expects white spaces");
-                _update_last_error(r);
-                return r;
-            }
-        };
+        return _make_alias('WS', P.WS, REPEAT(IN([' ', '\t', '\n', '\n'].join('')), min_len, max_len));
     }
 
     // Range: matches character in a range
@@ -149,17 +127,35 @@ module paka {
         };
     }
 
-    // Digit: matches digit, example: '1' 
-    export function DIGIT() {
-        var _func = 'DIGIT';
+    // Alphabet: matches alphabet, exmaple: 'L'
+    export function ALPH() {
+        return _make_alias('ALPH', P.ALPH, OR(RANGE('a', 'z'), RANGE('A', 'Z')));
+    }
+
+    // Unicode: matches a unicode character, exmaple: 'L'
+    export function UNICODE() {
+        var _func = 'UNICODE';
         return function(buffer: string, index: number, depth: number = 0) {
             _trace(_func, depth, true);
-            var parser = RANGE('0', '9');
-            var r = parser(buffer, index, depth);
-            r.operator = P.DIGIT;
+            var r: R;
+
+            if (index < buffer.length) {
+                r = R.ok(P.UNICODE, index, 1, null);    
+            }
+            else {
+                r = R.error(P.UNICODE, index, null, 'Expects a unicode character');
+            }
+
+            S.ERROR == r.status && _update_last_error(r);
             _trace(_func, depth, false, r.status);
             return r;
         };
+    }
+
+
+    // Digit: matches digit, example: '1' 
+    export function DIGIT() {
+        return _make_alias('DIGIT', P.DIGIT, RANGE('0', '9'));
     }
 
     // Hex Digit: matches hex digit, example: 'f' 
@@ -191,69 +187,12 @@ module paka {
 
     // Int: matches signed integer, example: '-123'
     export function INT(max_len: number = Number.MAX_VALUE) {
-        var _func = 'INT';
-        return function(buffer: string, index: number, depth: number = 0) {
-            _trace(_func, depth, true);
-            var parser = CONCAT(OPT(OR('+', '-')), REPEAT(DIGIT(), 1, max_len));
-            var r = parser(buffer, index, depth);
-            r.operator = P.INT;
-            _trace(_func, depth, false, r.status);
-            return r;
-        };
+        return _make_alias('INT', P.INT, CONCAT(OPT(OR('+', '-')), REPEAT(DIGIT(), 1, max_len)));
     }
 
     // Unsigned Int: matches unsigned signed integer, example: '123'
     export function UINT(max_len: number = Number.MAX_VALUE) {
-        var _func = 'UINT';
-        return function(buffer: string, index: number, depth: number = 0) {
-            _trace(_func, depth, true);
-            var parser = CONCAT(REPEAT(DIGIT(), 1, max_len));
-            var r = parser(buffer, index, depth);
-            r.operator = P.UINT;
-            _trace(_func, depth, false, r.status);
-            return r;
-        };
-    }
-
-    // Alphabet: matches alphabet, exmaple: 'L'
-    export function ALPH() {
-        var _func = 'ALPH';
-        return function(buffer: string, index: number, depth: number = 0) {
-            _trace(_func, depth, true);
-            var r: R;
-            var c = buffer.charAt(index);
-
-            if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) {
-                _trace(_func, depth, false, S.OK);
-                return R.ok(P.ALPH, index, 1, null);    
-            }
-            else {
-                r = R.error(P.ALPH, index, null, 'Expects alphabet');
-                _update_last_error(r);
-                _trace(_func, depth, false, S.ERROR);
-                return r;
-            }
-        };
-    }
-
-    // Unicode: matches a unicode character, exmaple: 'L'
-    export function UNICODE() {
-        var _func = 'UNICODE';
-        return function(buffer: string, index: number, depth: number = 0) {
-            _trace(_func, depth, true);
-            var r: R;
-
-            if (index < buffer.length) {
-                r = R.ok(P.UNICODE, index, 1, null);    
-            }
-            else {
-                r = R.error(P.UNICODE, index, null, 'Expects a unicode character');
-            }
-
-            S.ERROR == r.status && _update_last_error(r);
-            _trace(_func, depth, false, r.status);
-            return r;
-        };
+        return _make_alias('UINT', P.UINT, CONCAT(REPEAT(DIGIT(), 1, max_len)));
     }
 
     // Symbol: matches a string like "function"
@@ -350,21 +289,19 @@ module paka {
     // Sequence: matches all the sub-parsers in sequence 
     export function SEQ(...parsers) {
         var _func = 'SEQ';
+        var _parsers : Function[] = [];
+
+        for (var i = 0; i < parsers.length; ++i) {
+            _parsers.push(_wrap(parsers[i]));
+        }
+
         return function(buffer: string, index: number, depth: number = 0): R {
             _trace(_func, depth, true);
-            var i: number;
-            var idx: number;
-            var children: R[];
+            var idx: number = index;
+            var children: R[] = [];
             
-            idx  = index;
-            children = [];
-            
-            for (i = 0; i < parsers.length; ++i) {
-                var r: R;
-                var parser: Function;
-
-                parser = _wrap(parsers[i]);
-                r = parser(buffer, idx, depth + 1);
+            for (var i = 0; i < _parsers.length; ++i) {
+                var r: R = _parsers[i](buffer, idx, depth + 1);
                 
                 children.push(r);
 
@@ -387,23 +324,21 @@ module paka {
     // Sequence: matches all the sub-parsers in sequence ignore whitespaces between them
     export function CONCAT(...parsers) {
         var _func = 'CONCAT';
-        var _parsers = _insert_ws_matchers(parsers);
+        var _parsers : Function[] = [];
+
+        for (var i = 0; i < parsers.length; ++i) {
+            _parsers.push(_wrap(parsers[i]));
+        }
+
+        _parsers = _insert_ws_matchers(_parsers);
 
         return function(buffer: string, index: number, depth: number = 0): R {
             _trace(_func, depth, true);
-            var i: number;
-            var idx: number;
-            var children: R[];
-            
-            idx  = index;
-            children = [];
+            var idx: number = index;
+            var children: R[] = [];
 
-            for (i = 0; i < _parsers.length; ++i) {
-                var r: R;
-                var parser: Function;
-
-                parser = _wrap(_parsers[i]);
-                r = parser(buffer, idx, depth + 1);
+            for (var i = 0; i < _parsers.length; ++i) {
+                var r: R = _parsers[i](buffer, idx, depth + 1);
 
                 _log('depth=' + depth + ', i=' + i + ', op=' + r.operator, depth);
                 
@@ -514,19 +449,20 @@ module paka {
 
     export function OR(...parsers) {
         var _func = 'OR';
+        var _parsers : Function[] = [];
+
+        for (var i = 0; i < parsers.length; ++i) {
+            _parsers.push(_wrap(parsers[i]));
+        }
+
         return function(buffer: string, index: number, depth: number = 0): R {
             _trace(_func, depth, true);
             var r: R;
             var i: number;
-            var children: R[];
-            
-            children = [];
+            var children: R[] = [];
 
-            for (i = 0; i < parsers.length; ++i) {
-                var parser = _wrap(parsers[i]);
-                var _r: R;
-
-                _r = parser(buffer, index, depth + 1);
+            for (i = 0; i < _parsers.length; ++i) {
+                var _r: R = _parsers[i](buffer, index, depth + 1);
 
                 if (S.OK == _r.status) {
                     _trace(_func, depth, false, S.OK);
@@ -546,19 +482,21 @@ module paka {
 
     export function NOT(...parsers) {
         var _func = 'OR';
+        var _parsers : Function[] = [];
+
+        for (var i = 0; i < parsers.length; ++i) {
+            _parsers.push(_wrap(parsers[i]));
+        }
+
         return function(buffer: string, index: number, depth: number = 0): R {
             _trace(_func, depth, true);
             var r: R;
-            var i: number;
-            var children: R[];
-            
-            children = [];
+            var children: R[] = [];
 
-            for (i = 0; i < parsers.length; ++i) {
-                var parser = _wrap(parsers[i]);
+            for (var i = 0; i < _parsers.length; ++i) {
                 var _r: R;
 
-                _r = parser(buffer, index, depth + 1);
+                _r = _parsers[i](buffer, index, depth + 1);
 
                 if (S.OK == _r.status) {
                     _trace(_func, depth, false, S.OK);
@@ -578,21 +516,17 @@ module paka {
 
     export function REPEAT(parser, min_times: number = 0, max_times: number = Number.MAX_VALUE) {
         var _func = 'REPEAT';
+        var _parser: Function = _wrap(parser);
 
         return function(buffer: string, index: number, depth: number = 0): R {
             _trace(_func, depth, true);
 
             var i: number;
-            var idx: number;
-            var children: R[];
-
-            idx = index;
-            children = [];
+            var idx: number = index;
+            var children: R[]= [];
 
             while (idx < buffer.length && children.length < max_times) {
-                var _r: R;
-
-                _r = _wrap(parser)(buffer, idx, depth + 1);
+                var _r: R = _parser(buffer, idx, depth + 1);
 
                 if (S.OK == _r.status) {
                     idx += _r.length;
@@ -667,8 +601,8 @@ module paka {
         return ('string' == typeof(arg)) ? SYM(arg) : arg;
     }
 
-    function _insert_ws_matchers(parsers) {
-        var _parsers = [];
+    function _insert_ws_matchers(parsers): Function[] {
+        var _parsers: Function[] = [];
         var _ws = WS(0);
         _parsers.push(_ws);
         for (var i = 0; i < parsers.length; ++i) {
@@ -699,7 +633,7 @@ module paka {
         }
     }
 
-    function _make_alias(name: string, operator: string, parser: Function) {
+    function _make_alias(name: string, operator: string, parser: Function): Function {
         var _name = name;
         var _parser = parser;
 

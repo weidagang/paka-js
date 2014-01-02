@@ -94,28 +94,7 @@
     function WS(min_len, max_len) {
         if (typeof min_len === "undefined") { min_len = 1; }
         if (typeof max_len === "undefined") { max_len = Number.MAX_VALUE; }
-        return function (buffer, index, depth) {
-            var r;
-            var idx = 0;
-            var len = 0;
-
-            for (idx = index; idx < buffer.length && idx - index < max_len; ++idx) {
-                var c = buffer.charAt(idx);
-                if (' ' != c && '\t' != c && '\n' != c && '\r' != c) {
-                    break;
-                }
-            }
-
-            len = idx - index;
-
-            if (len >= min_len && len <= max_len) {
-                return R.ok(paka.P.WS, index, len, null);
-            } else {
-                r = R.error(paka.P.WS, index, null, "Expects white spaces");
-                _update_last_error(r);
-                return r;
-            }
-        };
+        return _make_alias('WS', paka.P.WS, REPEAT(IN([' ', '\t', '\n', '\n'].join('')), min_len, max_len));
     }
     paka.WS = WS;
 
@@ -139,86 +118,9 @@
     }
     paka.RANGE = RANGE;
 
-    // Digit: matches digit, example: '1'
-    function DIGIT() {
-        var _func = 'DIGIT';
-        return function (buffer, index, depth) {
-            if (typeof depth === "undefined") { depth = 0; }
-            _trace(_func, depth, true);
-            var parser = RANGE('0', '9');
-            var r = parser(buffer, index, depth);
-            r.operator = paka.P.DIGIT;
-            _trace(_func, depth, false, r.status);
-            return r;
-        };
-    }
-    paka.DIGIT = DIGIT;
-
-    // Hex Digit: matches hex digit, example: 'f'
-    function HEX_DIGIT() {
-        return _make_alias('HEX_DIGIT', paka.P.HEX_DIGIT, OR(RANGE('0', '9'), RANGE('a', 'f'), RANGE('A', 'F')));
-    }
-    paka.HEX_DIGIT = HEX_DIGIT;
-
-    // Number: matches number, example: '-123e-8'
-    function NUM() {
-        var _parser = SEQ(OPT('-'), OR('0', SEQ(RANGE('1', '9'), REPEAT(DIGIT()))), OPT(SEQ('.', REPEAT(DIGIT(), 1))), OPT(SEQ(OR('e', 'E'), OPT(OR('+', '-')), REPEAT(DIGIT(), 1))));
-
-        return _make_alias('NUM', paka.P.NUM, _parser);
-    }
-    paka.NUM = NUM;
-
-    // Int: matches signed integer, example: '-123'
-    function INT(max_len) {
-        if (typeof max_len === "undefined") { max_len = Number.MAX_VALUE; }
-        var _func = 'INT';
-        return function (buffer, index, depth) {
-            if (typeof depth === "undefined") { depth = 0; }
-            _trace(_func, depth, true);
-            var parser = CONCAT(OPT(OR('+', '-')), REPEAT(DIGIT(), 1, max_len));
-            var r = parser(buffer, index, depth);
-            r.operator = paka.P.INT;
-            _trace(_func, depth, false, r.status);
-            return r;
-        };
-    }
-    paka.INT = INT;
-
-    // Unsigned Int: matches unsigned signed integer, example: '123'
-    function UINT(max_len) {
-        if (typeof max_len === "undefined") { max_len = Number.MAX_VALUE; }
-        var _func = 'UINT';
-        return function (buffer, index, depth) {
-            if (typeof depth === "undefined") { depth = 0; }
-            _trace(_func, depth, true);
-            var parser = CONCAT(REPEAT(DIGIT(), 1, max_len));
-            var r = parser(buffer, index, depth);
-            r.operator = paka.P.UINT;
-            _trace(_func, depth, false, r.status);
-            return r;
-        };
-    }
-    paka.UINT = UINT;
-
     // Alphabet: matches alphabet, exmaple: 'L'
     function ALPH() {
-        var _func = 'ALPH';
-        return function (buffer, index, depth) {
-            if (typeof depth === "undefined") { depth = 0; }
-            _trace(_func, depth, true);
-            var r;
-            var c = buffer.charAt(index);
-
-            if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) {
-                _trace(_func, depth, false, paka.S.OK);
-                return R.ok(paka.P.ALPH, index, 1, null);
-            } else {
-                r = R.error(paka.P.ALPH, index, null, 'Expects alphabet');
-                _update_last_error(r);
-                _trace(_func, depth, false, paka.S.ERROR);
-                return r;
-            }
-        };
+        return _make_alias('ALPH', paka.P.ALPH, OR(RANGE('a', 'z'), RANGE('A', 'Z')));
     }
     paka.ALPH = ALPH;
 
@@ -242,6 +144,40 @@
         };
     }
     paka.UNICODE = UNICODE;
+
+    // Digit: matches digit, example: '1'
+    function DIGIT() {
+        return _make_alias('DIGIT', paka.P.DIGIT, RANGE('0', '9'));
+    }
+    paka.DIGIT = DIGIT;
+
+    // Hex Digit: matches hex digit, example: 'f'
+    function HEX_DIGIT() {
+        return _make_alias('HEX_DIGIT', paka.P.HEX_DIGIT, OR(RANGE('0', '9'), RANGE('a', 'f'), RANGE('A', 'F')));
+    }
+    paka.HEX_DIGIT = HEX_DIGIT;
+
+    // Number: matches number, example: '-123e-8'
+    function NUM() {
+        var _parser = SEQ(OPT('-'), OR('0', SEQ(RANGE('1', '9'), REPEAT(DIGIT()))), OPT(SEQ('.', REPEAT(DIGIT(), 1))), OPT(SEQ(OR('e', 'E'), OPT(OR('+', '-')), REPEAT(DIGIT(), 1))));
+
+        return _make_alias('NUM', paka.P.NUM, _parser);
+    }
+    paka.NUM = NUM;
+
+    // Int: matches signed integer, example: '-123'
+    function INT(max_len) {
+        if (typeof max_len === "undefined") { max_len = Number.MAX_VALUE; }
+        return _make_alias('INT', paka.P.INT, CONCAT(OPT(OR('+', '-')), REPEAT(DIGIT(), 1, max_len)));
+    }
+    paka.INT = INT;
+
+    // Unsigned Int: matches unsigned signed integer, example: '123'
+    function UINT(max_len) {
+        if (typeof max_len === "undefined") { max_len = Number.MAX_VALUE; }
+        return _make_alias('UINT', paka.P.UINT, CONCAT(REPEAT(DIGIT(), 1, max_len)));
+    }
+    paka.UINT = UINT;
 
     // Symbol: matches a string like "function"
     function SYM(symbol) {
@@ -332,22 +268,20 @@
             parsers[_i] = arguments[_i + 0];
         }
         var _func = 'SEQ';
+        var _parsers = [];
+
+        for (var i = 0; i < parsers.length; ++i) {
+            _parsers.push(_wrap(parsers[i]));
+        }
+
         return function (buffer, index, depth) {
             if (typeof depth === "undefined") { depth = 0; }
             _trace(_func, depth, true);
-            var i;
-            var idx;
-            var children;
+            var idx = index;
+            var children = [];
 
-            idx = index;
-            children = [];
-
-            for (i = 0; i < parsers.length; ++i) {
-                var r;
-                var parser;
-
-                parser = _wrap(parsers[i]);
-                r = parser(buffer, idx, depth + 1);
+            for (var i = 0; i < _parsers.length; ++i) {
+                var r = _parsers[i](buffer, idx, depth + 1);
 
                 children.push(r);
 
@@ -374,24 +308,22 @@
             parsers[_i] = arguments[_i + 0];
         }
         var _func = 'CONCAT';
-        var _parsers = _insert_ws_matchers(parsers);
+        var _parsers = [];
+
+        for (var i = 0; i < parsers.length; ++i) {
+            _parsers.push(_wrap(parsers[i]));
+        }
+
+        _parsers = _insert_ws_matchers(_parsers);
 
         return function (buffer, index, depth) {
             if (typeof depth === "undefined") { depth = 0; }
             _trace(_func, depth, true);
-            var i;
-            var idx;
-            var children;
+            var idx = index;
+            var children = [];
 
-            idx = index;
-            children = [];
-
-            for (i = 0; i < _parsers.length; ++i) {
-                var r;
-                var parser;
-
-                parser = _wrap(_parsers[i]);
-                r = parser(buffer, idx, depth + 1);
+            for (var i = 0; i < _parsers.length; ++i) {
+                var r = _parsers[i](buffer, idx, depth + 1);
 
                 _log('depth=' + depth + ', i=' + i + ', op=' + r.operator, depth);
 
@@ -512,20 +444,21 @@
             parsers[_i] = arguments[_i + 0];
         }
         var _func = 'OR';
+        var _parsers = [];
+
+        for (var i = 0; i < parsers.length; ++i) {
+            _parsers.push(_wrap(parsers[i]));
+        }
+
         return function (buffer, index, depth) {
             if (typeof depth === "undefined") { depth = 0; }
             _trace(_func, depth, true);
             var r;
             var i;
-            var children;
+            var children = [];
 
-            children = [];
-
-            for (i = 0; i < parsers.length; ++i) {
-                var parser = _wrap(parsers[i]);
-                var _r;
-
-                _r = parser(buffer, index, depth + 1);
+            for (i = 0; i < _parsers.length; ++i) {
+                var _r = _parsers[i](buffer, index, depth + 1);
 
                 if (paka.S.OK == _r.status) {
                     _trace(_func, depth, false, paka.S.OK);
@@ -549,20 +482,22 @@
             parsers[_i] = arguments[_i + 0];
         }
         var _func = 'OR';
+        var _parsers = [];
+
+        for (var i = 0; i < parsers.length; ++i) {
+            _parsers.push(_wrap(parsers[i]));
+        }
+
         return function (buffer, index, depth) {
             if (typeof depth === "undefined") { depth = 0; }
             _trace(_func, depth, true);
             var r;
-            var i;
-            var children;
+            var children = [];
 
-            children = [];
-
-            for (i = 0; i < parsers.length; ++i) {
-                var parser = _wrap(parsers[i]);
+            for (var i = 0; i < _parsers.length; ++i) {
                 var _r;
 
-                _r = parser(buffer, index, depth + 1);
+                _r = _parsers[i](buffer, index, depth + 1);
 
                 if (paka.S.OK == _r.status) {
                     _trace(_func, depth, false, paka.S.OK);
@@ -584,22 +519,18 @@
         if (typeof min_times === "undefined") { min_times = 0; }
         if (typeof max_times === "undefined") { max_times = Number.MAX_VALUE; }
         var _func = 'REPEAT';
+        var _parser = _wrap(parser);
 
         return function (buffer, index, depth) {
             if (typeof depth === "undefined") { depth = 0; }
             _trace(_func, depth, true);
 
             var i;
-            var idx;
-            var children;
-
-            idx = index;
-            children = [];
+            var idx = index;
+            var children = [];
 
             while (idx < buffer.length && children.length < max_times) {
-                var _r;
-
-                _r = _wrap(parser)(buffer, idx, depth + 1);
+                var _r = _parser(buffer, idx, depth + 1);
 
                 if (paka.S.OK == _r.status) {
                     idx += _r.length;
