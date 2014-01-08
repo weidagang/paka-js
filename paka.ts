@@ -75,10 +75,61 @@ module paka {
             );
         }
     };
+    
+    // Lexical token
+    class Token {
+        constructor(public text: string
+            , public type: string
+            , public line: number
+            , public column: number
+            , public length: number
+            ) {
+        }
+    }
+
+    class TokenStream {
+        private _src: string; // the source string
+        private _src_idx: number; // the current position of source code
+        private _src_line_num: number; // the current line number
+
+        private _index: number; // the current index of token
+        private _total: number; // the total number of tokens
+        private _tokens: Token[]; // tokens
+
+        constructor(src: string, options) {
+            this._src = src;
+             
+            this._index = 0;
+        }
+
+        public index(): number {
+            return this._index;
+        }
+
+        public total(): number {
+            return this._total;
+        }
+
+        public eos(): boolean {
+            return this._index >= this._total;
+        }
+
+        public read(delta: number = 0): Token {
+            return this._tokens[this._index + delta];
+        }
+
+        public move(delta: number = 1) {
+            if (delta <= 0) {
+                throw 'Invalid argument for move ' + delta;
+            }
+            this._index += delta;
+        }
+    }
    
-    export function create(grammar, action) {
-        _grammar = grammar;
-        _action = action;
+    export function create(config) {
+        _lex = config.lex;
+        _grammar = config.grammar;
+        _action = config.action;
         
         return {
             parse : function parse(rule: string, src: string) {
@@ -591,6 +642,7 @@ module paka {
     var _trace_enabled: boolean = false;
     var _debug_enabled: boolean = false;
     var _last_error: R;
+    var _lex;
     var _grammar;
     var _action;
     var _src;

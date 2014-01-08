@@ -61,9 +61,52 @@
     paka.R = R;
     ;
 
-    function create(grammar, action) {
-        _grammar = grammar;
-        _action = action;
+    var Token = (function () {
+        function Token(text, type, line, column, length) {
+            this.text = text;
+            this.type = type;
+            this.line = line;
+            this.column = column;
+            this.length = length;
+        }
+        return Token;
+    })();
+
+    var TokenStream = (function () {
+        function TokenStream(src, options) {
+            this._src = src;
+        }
+        TokenStream.prototype.index = function () {
+            return this._index;
+        };
+
+        TokenStream.prototype.total = function () {
+            return this._total;
+        };
+
+        TokenStream.prototype.eos = function () {
+            return this._index >= this._total;
+        };
+
+        TokenStream.prototype.read = function (delta) {
+            if (typeof delta === "undefined") { delta = 0; }
+            return this._tokens[this._index + delta];
+        };
+
+        TokenStream.prototype.move = function (delta) {
+            if (typeof delta === "undefined") { delta = 1; }
+            if (delta <= 0) {
+                throw 'Invalid argument for move ' + delta;
+            }
+            this._index += delta;
+        };
+        return TokenStream;
+    })();
+
+    function create(config) {
+        _lex = config.lex;
+        _grammar = config.grammar;
+        _action = config.action;
 
         return {
             parse: function parse(rule, src) {
@@ -598,6 +641,7 @@
     var _trace_enabled = false;
     var _debug_enabled = false;
     var _last_error;
+    var _lex;
     var _grammar;
     var _action;
     var _src;
