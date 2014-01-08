@@ -34,6 +34,17 @@ module paka {
         PERMU : 'PERMU' // permutation
     };
 
+    export class Position { constructor(public index: number, public line: number, public column : number){} }
+
+    export class ErrorInfo { 
+        constructor(public line: number, public column : number, public context: string) {
+        } 
+
+        public to_str(): string {
+            return 'Error at line ' + this.line + ' column ' + this.column + ':\n' + this.context;
+        }
+    }
+
     // parsing result
     export class R {
         constructor(public status: string
@@ -47,8 +58,14 @@ module paka {
             ) {
         }
 
+        public error_info: ErrorInfo;
+
         public text(): string {
             return 0 != this.length ? _src.substring(this.index, this.index + this.length) : null;
+        }
+
+        public matched(): boolean {
+            return S.OK == this.status;
         }
 
         static ok(operator: string, index: number, length: number, children: R[]): R {
@@ -84,7 +101,12 @@ module paka {
             parse : function parse(rule: string, src: string) {
                 _src = src;
                 _last_error = null;
-                return $(rule)(src, 0);
+                var r = $(rule)(src, 0);
+                if (!r.matched()) {
+                    var err_pos = last_error_pos();
+                    r.error_info = new ErrorInfo(err_pos.line, err_pos.column, last_error_context());
+                }
+                return r;
             }
         };
     }
@@ -585,6 +607,45 @@ module paka {
 
     export function last_error(): R {
         return _last_error;
+    }
+
+    export function last_error_pos(): Position {
+        if (null == _last_error) {
+            return null; 
+        }
+        
+        var ln: number = 1;
+        var ln_idx: number = -1;
+
+        for (var i = 0; i < _last_error.index; ++i) {
+            if ('\n' == _src.charAt(i)) {
+                ++ln; 
+                ln_idx = i;
+            }
+        }
+
+        return new Position(_last_error.index, ln, _last_error.index - ln_idx);
+    }
+
+    export function last_error_context(): string {
+        if (null == _last_error) {
+            return null; 
+        }
+        
+        var err_pos: Position = last_error_pos();
+        var err_line = _src.split('\n')[err_pos.line - 1];
+        var err_idx : number = err_pos.column - 1;
+
+        var left = err_line.substring(err_idx  - 20, err_idx);
+        var right = err_line.substring(err_idx , err_idx  + 20);
+        
+        var sp = '';
+        for (var i = 0; i < left.length; ++i) {
+            sp += ' ';
+        }
+        sp += '^^^';
+
+        return left + right + '\n' + sp;
     }
 
     // ======== private fields ======== 

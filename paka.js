@@ -33,6 +33,29 @@
         PERMU: 'PERMU'
     };
 
+    var Position = (function () {
+        function Position(index, line, column) {
+            this.index = index;
+            this.line = line;
+            this.column = column;
+        }
+        return Position;
+    })();
+    paka.Position = Position;
+
+    var ErrorInfo = (function () {
+        function ErrorInfo(line, column, context) {
+            this.line = line;
+            this.column = column;
+            this.context = context;
+        }
+        ErrorInfo.prototype.to_str = function () {
+            return 'Error at line ' + this.line + ' column ' + this.column + ':\n' + this.context;
+        };
+        return ErrorInfo;
+    })();
+    paka.ErrorInfo = ErrorInfo;
+
     // parsing result
     var R = (function () {
         function R(status, rule, operator, index, length, children, extra, err) {
@@ -47,6 +70,10 @@
         }
         R.prototype.text = function () {
             return 0 != this.length ? _src.substring(this.index, this.index + this.length) : null;
+        };
+
+        R.prototype.matched = function () {
+            return paka.S.OK == this.status;
         };
 
         R.ok = function (operator, index, length, children) {
@@ -69,7 +96,12 @@
             parse: function parse(rule, src) {
                 _src = src;
                 _last_error = null;
-                return $(rule)(src, 0);
+                var r = $(rule)(src, 0);
+                if (!r.matched()) {
+                    var err_pos = last_error_pos();
+                    r.error_info = new ErrorInfo(err_pos.line, err_pos.column, last_error_context());
+                }
+                return r;
             }
         };
     }
@@ -593,6 +625,47 @@
         return _last_error;
     }
     paka.last_error = last_error;
+
+    function last_error_pos() {
+        if (null == _last_error) {
+            return null;
+        }
+
+        var ln = 1;
+        var ln_idx = -1;
+
+        for (var i = 0; i < _last_error.index; ++i) {
+            if ('\n' == _src.charAt(i)) {
+                ++ln;
+                ln_idx = i;
+            }
+        }
+
+        return new Position(_last_error.index, ln, _last_error.index - ln_idx);
+    }
+    paka.last_error_pos = last_error_pos;
+
+    function last_error_context() {
+        if (null == _last_error) {
+            return null;
+        }
+
+        var err_pos = last_error_pos();
+        var err_line = _src.split('\n')[err_pos.line - 1];
+        var err_idx = err_pos.column - 1;
+
+        var left = err_line.substring(err_idx - 20, err_idx);
+        var right = err_line.substring(err_idx, err_idx + 20);
+
+        var sp = '';
+        for (var i = 0; i < left.length; ++i) {
+            sp += ' ';
+        }
+        sp += '^^^';
+
+        return left + right + '\n' + sp;
+    }
+    paka.last_error_context = last_error_context;
 
     // ======== private fields ========
     var _trace_enabled = false;

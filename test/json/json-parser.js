@@ -66,12 +66,7 @@ function parse(src) {
         'JSON' : function(r) { r.extra = r.children[0].extra; }
     }
 
-    var parser = paka.create(grammar, actions);
-    var ast = parser.parse('JSON', src);
-
-    //console.log(util.inspect(ast, false, 10));
-
-    return ast;
+    return paka.create(grammar, actions).parse('JSON', src);
 }
 
 module.exports = { parse : parse };

@@ -67,20 +67,11 @@ function calculate(src) {
 
     //console.log(util.inspect(ast, false, 10));
     
-    if (paka.S.OK == ast.status) {
+    if (ast.matched()) {
         console.log(src + ' = ' + ast.extra);
     }
     else {
-        var err_idx = paka.last_error().index;
-        console.error("Invalid expression, column " + err_idx + ':');
-        var left = src.substring(err_idx  - 20, err_idx );
-        var right = src.substring(err_idx , err_idx  + 20);
-        console.error(left + right);
-        var sp = '';
-        for (var i = 0; i < left.length; ++i) {
-            sp += ' ';
-        }
-        console.error(sp + '^^^');
+        console.error("Invalid expression. " + ast.error_info.to_str());
     }
 }
 
